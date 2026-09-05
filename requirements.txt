@@ -1,0 +1,9 @@
+Flask
+google-genai
+numpy
+pandas
+Pillow
+pydantic
+python-dotenv
+requests
+gunicorn; sys_platform != "win32"

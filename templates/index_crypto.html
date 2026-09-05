@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Market Dashboard</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #efebe0;
+      --paper-dark: #e3ddcb;
+      --ink: #24211d;
+      --carbon: #8a8375;
+      --carbon-light: #b8b2a0;
+      --green: #2f5d46;
+      --red: #a93226;
+      --yellow: #a8721f;
+      --table: #17140f;
+      --display: "Space Grotesk", sans-serif;
+      --body: "Inter", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--body);
+      background: var(--table);
+      background-image: radial-gradient(ellipse at 50% -10%, #2a251c 0%, var(--table) 60%);
+    }
+    .table { display: flex; justify-content: center; padding: 3rem 1rem 5rem; }
+    .receipt {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      padding: 2.75rem 2rem 2rem;
+      background: var(--paper);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .6);
+    }
+    .receipt::before, .receipt::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 12px;
+      background: linear-gradient(-45deg, var(--paper) 6px, transparent 0), linear-gradient(45deg, var(--paper) 6px, transparent 0);
+      background-size: 12px 12px;
+      background-repeat: repeat-x;
+    }
+    .receipt::before { top: -12px; }
+    .receipt::after { bottom: -12px; transform: scaleY(-1); }
+    .receipt-header { text-align: center; }
+    .eyebrow, .tagline, .price, .change, .panel-link, .footer-note { font-family: var(--mono); }
+    .eyebrow { margin: 0 0 .5rem; color: var(--carbon); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; font: 700 clamp(2rem, 6vw, 2.6rem) var(--display); letter-spacing: .02em; }
+    .tagline { margin: .4rem 0 0; color: var(--carbon); font-size: .85rem; }
+    .lobby-link { display: inline-block; margin-top: 1rem; color: var(--ink); font: 700 .85rem var(--display); letter-spacing: .02em; text-decoration: none; border: 1.5px solid var(--ink); padding: .65rem 1.1rem; }
+    .lobby-link:hover { background: var(--paper-dark); }
+    .tear { height: 2px; margin: 1.75rem 0; background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px); }
+    .panel { margin-bottom: .5rem; }
+    .panel-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .9rem; }
+    h2 { display: flex; align-items: center; gap: .5rem; margin: 0; font: 700 1.05rem var(--display); }
+    .panel-link { color: var(--ink); font-size: .7rem; letter-spacing: .04em; text-decoration: none; border-bottom: 1px dashed var(--carbon-light); }
+    .panel-link:hover { color: var(--yellow); }
+    .coin-row { display: grid; grid-template-columns: auto 1fr 60px auto; align-items: center; gap: .9rem; padding: .7rem 0; border-bottom: 1px dashed var(--carbon-light); }
+    .coin-row:last-child { border-bottom: 0; }
+    .coin-icon { display: flex; width: 34px; height: 34px; align-items: center; justify-content: center; color: var(--ink); font: 600 .55rem var(--mono); background: var(--paper-dark); border: 1px solid var(--carbon-light); border-radius: 50%; text-transform: uppercase; }
+    .coin-name { font-size: .9rem; }
+    .sparkline { width: 60px; height: 30px; }
+    .sparkline svg { width: 100%; height: 100%; }
+    .price-block { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
+    .price { font-weight: 600; font-size: .88rem; white-space: nowrap; }
+    .change { display: inline-block; padding: .15rem .4rem; font-weight: 600; font-size: .58rem; letter-spacing: .03em; white-space: nowrap; background: var(--paper); border: 1.5px solid currentColor; border-radius: 50%; transform: rotate(-6deg); }
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+    .footer { margin-top: 2rem; text-align: center; }
+    .footer-note { margin: 0; color: var(--carbon); font-size: .68rem; letter-spacing: .06em; }
+
+    /* ===================== Search & Watchlist (BARU) ===================== */
+    .search-box { position: relative; margin-bottom: .9rem; }
+    .search-input {
+      width: 100%;
+      font-family: var(--body);
+      font-size: .9rem;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1px solid var(--carbon-light);
+      padding: .65rem .75rem;
+      border-radius: 2px;
+    }
+    .search-input:focus { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+    .search-hint {
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--carbon);
+      margin: .4rem 0 0;
+    }
+    .search-hint.penuh { color: var(--red); }
+
+    .search-results {
+      position: absolute;
+      left: 0; right: 0; top: calc(100% + 4px);
+      background: var(--paper);
+      border: 1px solid var(--carbon-light);
+      box-shadow: 0 12px 24px -8px rgba(0,0,0,.35);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 20;
+    }
+    .search-results[hidden] { display: none; }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      width: 100%;
+      padding: .55rem .7rem;
+      background: none;
+      border: none;
+      border-bottom: 1px dashed var(--carbon-light);
+      font-family: var(--body);
+      font-size: .82rem;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+    .search-result-item:last-child { border-bottom: 0; }
+    .search-result-item:hover { background: var(--paper-dark); }
+    .search-result-item .simbol {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--carbon);
+      text-transform: uppercase;
+    }
+
+    .coin-row.pantauan { cursor: pointer; transition: background .12s ease; }
+    .coin-row.pantauan:hover { background: var(--paper-dark); }
+
+    .btn-hapus-pantauan {
+      background: none;
+      border: none;
+      color: var(--carbon);
+      font-size: .9rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: .15rem .3rem;
+    }
+    .btn-hapus-pantauan:hover { color: var(--red); }
+
+    .kosong-pantauan {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--carbon);
+      font-style: italic;
+      padding: .5rem 0;
+    }
+
+    .hasil-analisa {
+      margin-top: 1rem;
+      padding: 1rem 1rem 1rem 1.1rem;
+      background: var(--paper-dark);
+      border-left: 4px solid var(--ink);
+      font-size: .85rem;
+      line-height: 1.55;
+    }
+    .hasil-analisa.error { border-left-color: var(--red); color: var(--red); }
+    .hasil-analisa h3 { font: 700 .88rem var(--display); margin: 0 0 .5rem; }
+    .hasil-analisa .baris-label {
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--carbon);
+      margin: .6rem 0 .15rem;
+    }
+    .hasil-analisa .baris-label:first-of-type { margin-top: 0; }
+    .hasil-analisa ul { margin: .2rem 0 0; padding-left: 1.1rem; }
+    .hasil-analisa .memuat { font-style: italic; color: var(--carbon); }
+
+    @media (max-width: 480px) {
+      .receipt { padding: 2.25rem 1.25rem 1.5rem; }
+      .coin-row { grid-template-columns: auto 1fr 44px auto; gap: .6rem; }
+      .sparkline { width: 44px; }
+      .panel-link { font-size: .62rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <div class="table">
+    <main class="receipt">
+      <header class="receipt-header">
+        <p class="eyebrow">Pasar Kripto - Cetakan Otomatis</p>
+        <h1>KRIPTO</h1>
+        <p class="tagline">Data Pasar Real-Time CoinGecko</p>
+        <a class="lobby-link" href="/">Kembali ke Lobby</a>
+      </header>
+
+      <div class="tear"></div>
+
+      <!-- ===================== PANEL DAFTAR PANTAUAN (BARU) ===================== -->
+      <section class="panel" aria-label="Daftar pantauan">
+        <div class="panel-header"><h2><span aria-hidden="true">&#128269;</span> Daftar Pantauan</h2></div>
+
+        <div class="search-box">
+          <input type="text" class="search-input" id="input-cari-koin"
+                 placeholder="Cari koin (misal: bitcoin, solana)...">
+          <div class="search-results" id="hasil-cari-koin" hidden></div>
+        </div>
+        <p class="search-hint" id="hint-pantauan">0 / 10 koin dipantau</p>
+
+        <div id="daftar-pantauan">
+          <p class="kosong-pantauan">Belum ada koin dipantau. Cari dan tambahkan di atas.</p>
+        </div>
+
+        <div id="hasil-analisa-pantauan" class="hasil-analisa" hidden></div>
+      </section>
+
+      <footer class="footer"><p class="footer-note">*** DATA DARI COINGECKO, BUKAN SARAN FINANSIAL ***</p></footer>
+    </main>
+  </div>
+  <script>
+    // ===========================================================================
+    // CATATAN UNTUK KAMU YANG NYAMBUNGIN KE FLASK:
+    //
+    // 1. Search koin & harga live dipanggil LANGSUNG ke API publik CoinGecko dari
+    //    browser (gak lewat backend kamu) — karena itu cuma baca data publik.
+    //
+    // 2. "Auto analisa" pas watchlist diklik manggil endpoint BACKEND KAMU:
+    //       const ENDPOINT_ANALISA_KRIPTO = "/analisa-kripto";
+    //    Sesuaikan kalau nama route-mu beda. Endpoint ini diharapkan:
+    //      - method POST
+    //      - terima field form: koin (contoh: "bitcoin", id CoinGecko)
+    //      - balikin JSON: { ringkasan_tren, tingkat_risiko, cocok_untuk_hold, rekomendasi: [] }
+    //        (persis field dari skema AnalisaInvestasiKripto yang kita rancang)
+    //
+    // 3. Watchlist disimpan di localStorage browser (per-device), BUKAN di server.
+    //    Kalau mau watchlist ikut kesimpen di server/akun user, perlu endpoint
+    //    tambahan buat itu — untuk sekarang cukup simpel dulu.
+    // ===========================================================================
+
+    const ENDPOINT_ANALISA_KRIPTO = "/analisa-kripto";
+    const MAKS_PANTAUAN = 10;
+    const KEY_LOCALSTORAGE = "dompet_galak_watchlist_kripto";
+
+    const inputCari = document.getElementById("input-cari-koin");
+    const hasilCariBox = document.getElementById("hasil-cari-koin");
+    const hintPantauan = document.getElementById("hint-pantauan");
+    const daftarPantauanEl = document.getElementById("daftar-pantauan");
+    const hasilAnalisaEl = document.getElementById("hasil-analisa-pantauan");
+
+    function muatWatchlist() {
+      try {
+        const raw = localStorage.getItem(KEY_LOCALSTORAGE);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function simpanWatchlist(daftar) {
+      localStorage.setItem(KEY_LOCALSTORAGE, JSON.stringify(daftar));
+    }
+
+    // --- Pencarian koin (CoinGecko /search) ---
+    let timerCari = null;
+
+    inputCari.addEventListener("input", () => {
+      clearTimeout(timerCari);
+      const kueri = inputCari.value.trim();
+
+      if (kueri.length < 2) {
+        hasilCariBox.hidden = true;
+        return;
+      }
+
+      // debounce 400ms biar gak nge-spam API tiap ketikan
+      timerCari = setTimeout(() => cariKoin(kueri), 400);
+    });
+
+    async function cariKoin(kueri) {
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(kueri)}`);
+        const data = await res.json();
+        const daftarKoin = (data.coins || []).slice(0, 8);
+
+        if (daftarKoin.length === 0) {
+          hasilCariBox.innerHTML = `<p class="kosong-pantauan" style="padding:.6rem .7rem;">Gak ketemu koin apapun.</p>`;
+          hasilCariBox.hidden = false;
+          return;
+        }
+
+        hasilCariBox.innerHTML = daftarKoin.map(koin => `
+          <button type="button" class="search-result-item" data-id="${koin.id}" data-nama="${koin.name}" data-simbol="${koin.symbol}">
+            <span class="simbol">${koin.symbol}</span>
+            <span>${koin.name}</span>
+          </button>
+        `).join("");
+        hasilCariBox.hidden = false;
+
+        hasilCariBox.querySelectorAll(".search-result-item").forEach(btn => {
+          btn.addEventListener("click", () => {
+            tambahKeWatchlist({ id: btn.dataset.id, nama: btn.dataset.nama, simbol: btn.dataset.simbol });
+            hasilCariBox.hidden = true;
+            inputCari.value = "";
+          });
+        });
+      } catch (err) {
+        hasilCariBox.hidden = true;
+      }
+    }
+
+    // tutup dropdown hasil cari kalau klik di luar search box
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-box")) hasilCariBox.hidden = true;
+    });
+
+    // --- Kelola watchlist ---
+    function tambahKeWatchlist(koin) {
+      const daftar = muatWatchlist();
+
+      if (daftar.some(k => k.id === koin.id)) return; // udah ada, jangan dobel
+
+      if (daftar.length >= MAKS_PANTAUAN) {
+        hintPantauan.textContent = `Maksimal ${MAKS_PANTAUAN} koin. Hapus salah satu dulu buat nambah yang baru.`;
+        hintPantauan.classList.add("penuh");
+        return;
+      }
+
+      daftar.push(koin);
+      simpanWatchlist(daftar);
+      renderWatchlist();
+    }
+
+    function hapusDariWatchlist(id) {
+      const daftar = muatWatchlist().filter(k => k.id !== id);
+      simpanWatchlist(daftar);
+      renderWatchlist();
+    }
+
+    function barisPantauanHtml(koin, harga) {
+      const hargaTeks = harga
+        ? `US$${Number(harga.usd).toLocaleString("en-US", { maximumFractionDigits: 4 })}`
+        : "memuat...";
+      const perubahan = harga ? harga.usd_24h_change : null;
+      const arah = perubahan == null ? "" : (perubahan >= 0 ? "up" : "down");
+      const panah = perubahan == null ? "" : (perubahan >= 0 ? "&#9650;" : "&#9660;");
+      const perubahanTeks = perubahan == null ? "" : `${panah} ${Math.abs(perubahan).toFixed(1)}%`
+
+      return `
+        <div class="coin-row pantauan" data-id="${koin.id}" data-nama="${koin.nama}">
+          <div class="coin-icon">${koin.simbol}</div>
+          <div class="coin-name">${koin.nama}</div>
+          <button type="button" class="btn-hapus-pantauan" data-hapus="${koin.id}" title="Hapus dari pantauan" aria-label="Hapus dari pantauan">&times;</button>
+          <div class="price-block">
+            <span class="price">${hargaTeks}</span>
+            ${perubahanTeks ? `<span class="change ${arah}">${perubahanTeks}</span>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function pasangKlikBaris() {
+      daftarPantauanEl.querySelectorAll(".btn-hapus-pantauan").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          hapusDariWatchlist(btn.dataset.hapus);
+        });
+      });
+
+      daftarPantauanEl.querySelectorAll(".coin-row.pantauan").forEach(row => {
+        row.addEventListener("click", () => {
+          mintaAnalisaOtomatis(row.dataset.id, row.dataset.nama);
+        });
+      });
+    }
+
+    async function renderWatchlist() {
+      const daftar = muatWatchlist();
+
+      hintPantauan.classList.remove("penuh");
+      hintPantauan.textContent = `${daftar.length} / ${MAKS_PANTAUAN} koin dipantau`;
+
+      if (daftar.length === 0) {
+        daftarPantauanEl.innerHTML = `<p class="kosong-pantauan">Belum ada koin dipantau. Cari dan tambahkan di atas.</p>`;
+        return;
+      }
+
+      // tampilkan dulu dengan harga "memuat...", baru diisi setelah fetch selesai
+      daftarPantauanEl.innerHTML = daftar.map(koin => barisPantauanHtml(koin, null)).join("");
+      pasangKlikBaris();
+
+      try {
+        const ids = daftar.map(k => k.id).join(",");
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+        const hargaData = await res.json();
+
+        daftarPantauanEl.innerHTML = daftar.map(koin => barisPantauanHtml(koin, hargaData[koin.id] || null)).join("");
+        pasangKlikBaris();
+      } catch (err) {
+        // biarkan tampil "memuat..." kalau fetch harga gagal, gak fatal
+      }
+    }
+
+    // --- Auto analisa pas baris watchlist diklik ---
+    async function mintaAnalisaOtomatis(koinId, namaKoin) {
+      hasilAnalisaEl.hidden = false;
+      hasilAnalisaEl.classList.remove("error");
+      hasilAnalisaEl.innerHTML = `<p class="memuat">Menganalisa ${namaKoin}...</p>`;
+
+      try {
+        const formData = new FormData();
+        formData.append("koin", koinId);
+
+        const res = await fetch(ENDPOINT_ANALISA_KRIPTO, { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Gagal menganalisa.");
+
+        const rekomendasiHtml = (data.rekomendasi || []).map(r => `<li>${r}</li>`).join("");
+
+        hasilAnalisaEl.innerHTML = `
+          <h3>Analisa ${namaKoin}</h3>
+          <p>${data.ringkasan_tren || ""}</p>
+          <p class="baris-label">Tingkat Risiko</p>
+          <p>${data.tingkat_risiko || "-"}</p>
+          <p class="baris-label">Cocok untuk Hold?</p>
+          <p>${data.cocok_untuk_hold || "-"}</p>
+          ${rekomendasiHtml ? `<p class="baris-label">Rekomendasi</p><ul>${rekomendasiHtml}</ul>` : ""}
+        `;
+      } catch (err) {
+        hasilAnalisaEl.classList.add("error");
+        hasilAnalisaEl.innerHTML = `<p>${err.message || "Gagal terhubung ke server."}</p>`;
+      }
+    }
+
+    // Muat watchlist saat halaman dibuka
+    renderWatchlist();
+  </script>
+</body>
+</html>
