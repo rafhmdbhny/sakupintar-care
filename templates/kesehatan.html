@@ -310,6 +310,7 @@
           <p class="deskripsi">Dihitung otomatis dari sebagian keuntungan aset digital kamu, dikurangi pengeluaran kategori "Kesehatan" yang sudah tercatat.</p>
           <div class="analisa-actions">
             <button id="btn-hitung-dana" class="btn btn-sekunder">Hitung Ulang</button>
+            <button id="btn-alokasikan-dana" class="btn btn-utama">Alokasikan</button>
           </div>
         </div>
         <div class="analisa-pasar">
@@ -330,6 +331,7 @@
 <script>
   const ENDPOINT_KESEHATAN    = "/api/kesehatan";
   const ENDPOINT_DANA_DARURAT = "/api/dana-darurat";
+  const ENDPOINT_ALOKASI_DANA = "/api/dana-darurat/alokasikan";
   const KEY_RIWAYAT           = "riwayat_kesehatan";
 
   function formatRupiah(angka) {
@@ -466,6 +468,7 @@
   });
 
   const btnHitungDana = document.getElementById("btn-hitung-dana");
+  const btnAlokasikanDana = document.getElementById("btn-alokasikan-dana");
   const hasilDana = document.getElementById("hasil-dana");
 
   async function muatDanaDarurat() {
@@ -487,8 +490,8 @@
         hasilDana.innerHTML = `
           <h3>Rincian Dana Darurat Kesehatan</h3>
           <p>Keuntungan bulan ini: ${formatRupiah(data.keuntungan)}</p>
-          <p>Dialokasikan (10%): ${formatRupiah(data.alokasi)}</p>
-          <p>Sudah terpakai (transaksi kategori Kesehatan): ${formatRupiah(data.terpakai)}</p>
+          <p>Alokasi tersedia (10%): ${formatRupiah(data.alokasi)}</p>
+          <p>Saldo tersimpan: ${formatRupiah(data.saldo ?? data.sisa)}</p>
           <p><strong>Sisa dana darurat: ${formatRupiah(data.sisa)}</strong></p>
         `;
       }
@@ -503,6 +506,25 @@
   }
 
   btnHitungDana.addEventListener("click", muatDanaDarurat);
+
+  btnAlokasikanDana.addEventListener("click", async () => {
+    btnAlokasikanDana.disabled = true;
+    btnAlokasikanDana.textContent = "Menyimpan...";
+
+    try {
+      const res = await fetch(ENDPOINT_ALOKASI_DANA, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal mengalokasikan dana.");
+      await muatDanaDarurat();
+    } catch (err) {
+      hasilDana.hidden = false;
+      hasilDana.classList.add("error");
+      hasilDana.innerHTML = `<p>${err.message || "Gagal terhubung ke server."}</p>`;
+    } finally {
+      btnAlokasikanDana.disabled = false;
+      btnAlokasikanDana.textContent = "Alokasikan";
+    }
+  });
 
   renderRiwayatKesehatan();
   muatDanaDarurat();

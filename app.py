@@ -13,6 +13,8 @@ from Services.Main_system import (
     Read_pengaturan,
     Save_pengaturan,
     Analisa_kesehatan,
+    Ambil_saldo_dana_darurat,
+    Alokasikan_dana_darurat,
 )
 
 app = Flask(__name__)
@@ -45,6 +47,20 @@ def api_kesehatan():
         return jsonify(hasil.model_dump())
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/dana-darurat')
+def api_dana_darurat():
+    try:
+        return jsonify(Ambil_saldo_dana_darurat())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/dana-darurat/alokasikan', methods=['POST'])
+def api_alokasikan_dana():
+    try:
+        return jsonify(Alokasikan_dana_darurat())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/update-harga-kripto', methods=['POST'])
 def update_harga_kripto():

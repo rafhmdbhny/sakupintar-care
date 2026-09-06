@@ -170,6 +170,73 @@ def save_riwayat_transaksi(now, nama, jumlah, harga, kartegori):
     df = pd.concat([df, new_data], ignore_index=True)
     df.to_csv(os.path.join(PROJECT_ROOT, "Data_transaksi.csv"), index=False, encoding="utf-8")
 
+    if kartegori == "Kesehatan":
+        data_dana = Read_dana_darurat()
+        pengurangan = float(harga) * float(jumlah)
+        Save_dana_darurat(max(float(data_dana.get("saldo", 0)) - pengurangan, 0))
+
+
+DANA_DARURAT_PATH = os.path.join(PROJECT_ROOT, "Dana_darurat.json")
+
+
+def Read_dana_darurat():
+    if os.path.exists(DANA_DARURAT_PATH):
+        try:
+            with open(DANA_DARURAT_PATH, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            return {"saldo": max(float(data.get("saldo", 0)), 0)}
+        except (OSError, ValueError, TypeError):
+            pass
+
+    default = {"saldo": 0}
+    Save_dana_darurat(0)
+    return default
+
+
+def Save_dana_darurat(saldo):
+    with open(DANA_DARURAT_PATH, "w", encoding="utf-8") as file:
+        json.dump({"saldo": max(float(saldo), 0)}, file)
+
+
+def _hitung_alokasi_dana_darurat():
+    csv_kripto = os.path.join(PROJECT_ROOT, "Data_kripto.csv")
+    keuntungan = 0
+
+    if os.path.exists(csv_kripto):
+        try:
+            df_kripto = pd.read_csv(csv_kripto)
+            if not df_kripto.empty:
+                kolom_numerik = df_kripto.select_dtypes(include="number").columns
+                if len(kolom_numerik) > 0:
+                    keuntungan = float(df_kripto[kolom_numerik[0]].sum()) * 0.01
+        except (OSError, ValueError, TypeError):
+            keuntungan = 0
+
+    return keuntungan * 0.1
+
+
+def Ambil_saldo_dana_darurat():
+    alokasi_tersedia = _hitung_alokasi_dana_darurat()
+    saldo = Read_dana_darurat()["saldo"]
+    return {
+        "keuntungan": alokasi_tersedia / 0.1,
+        "alokasi": alokasi_tersedia,
+        "terpakai": 0,
+        "sisa": saldo,
+        "saldo": saldo,
+    }
+
+
+def Alokasikan_dana_darurat():
+    alokasi = _hitung_alokasi_dana_darurat()
+    saldo_baru = Read_dana_darurat()["saldo"] + alokasi
+    Save_dana_darurat(saldo_baru)
+    return {
+        "alokasi": alokasi,
+        "saldo": saldo_baru,
+        "sisa": saldo_baru,
+    }
+
 
 #total pengeluaran dan rata-rata pengeluaran letak=di atas dashboard dipisah menjadi 3 box
 def Analisis_riwayat_transaksi(budget):
