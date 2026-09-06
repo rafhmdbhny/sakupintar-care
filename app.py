@@ -1,6 +1,5 @@
 
 from Services.Crypto_System import Ambil_dan_simpan_harga, Analisa_kripto
-from Services.Health_System import Analisa_kesehatan
 from Services.Ai_Service import generate_response
 from flask import Flask, request, jsonify, render_template
 import datetime as dt
@@ -12,7 +11,8 @@ from Services.Main_system import (
     save_riwayat_transaksi,
     Analisis_riwayat_transaksi,
     Read_pengaturan,
-    Save_pengaturan
+    Save_pengaturan,
+    Analisa_kesehatan,
 )
 
 app = Flask(__name__)

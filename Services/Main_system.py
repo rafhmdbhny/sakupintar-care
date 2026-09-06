@@ -181,3 +181,50 @@ def Analisis_riwayat_transaksi(budget):
     persenan_pengeluaran = (total_pengeluaran / budget * 100) if budget > 0 else 0
     return total_pengeluaran, rata_rata_pengeluaran, persenan_pengeluaran
 
+
+class HasilKesehatan(BaseModel):
+    insight: str = Field(
+        description="Ringkasan kondisi kesehatan user berdasarkan BMI, umur, dan keluhan yang disebutkan."
+    )
+    kategori: list[str] = Field(
+        description=(
+            "Status/kategori kesehatan yang relevan, misal status BMI "
+            "(Kurus/Normal/Gemuk/Obesitas) dan tanda risiko lain kalau ada."
+        )
+    )
+    rekomendasi_aksi: list[str] = Field(
+        description="Saran konkret gaya hidup sehat yang bisa langsung dilakukan user (pola makan, olahraga, istirahat, dll)."
+    )
+    perlu_konsultasi_dokter: bool = Field(
+        default=False,
+        description="True kalau keluhan user menunjukkan tanda yang sebaiknya diperiksakan ke tenaga medis."
+    )
+
+
+kesehatan_config = genai.types.GenerateContentConfig(
+    system_instruction=(
+        "Kamu adalah asisten kesehatan yang suportif tapi tegas, mendorong gaya hidup sehat "
+        "berbasis data BMI, umur, dan keluhan user. Berikan saran praktis dan mudah diikuti. "
+        "Jangan mendiagnosis penyakit tertentu — kalau keluhan terdengar serius, sarankan "
+        "konsultasi ke tenaga medis profesional."
+    ),
+    temperature=0.3,
+    response_schema=HasilKesehatan,
+    response_mime_type="application/json",
+)
+
+
+def Analisa_kesehatan(umur, berat, tinggi, bmi, kategori_bmi, keluhan):
+    contents = f"""
+    Data kesehatan user:
+    Umur: {umur if umur else "tidak diisi"} tahun
+    Berat badan: {berat} kg
+    Tinggi badan: {tinggi} cm
+    BMI: {bmi} ({kategori_bmi})
+    Keluhan: {keluhan if keluhan else "tidak ada keluhan yang disebutkan"}
+
+    Berikan analisis kondisi kesehatan singkat dan saran aksi gaya hidup yang relevan.
+    """
+    response = generate_response(contents, kesehatan_config)
+    return response.parsed
+

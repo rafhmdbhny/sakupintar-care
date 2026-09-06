@@ -433,9 +433,19 @@
       if (!res.ok) {
         hasilKesehatan.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
       } else {
+        const kategoriHtml = (data.kategori || [])
+          .map(kategori => `<span class="badge-kategori">${kategori}</span>`)
+          .join("");
+        const rekomendasiHtml = (data.rekomendasi_aksi || [])
+          .map(saran => `<li>${saran}</li>`)
+          .join("");
+
         hasilKesehatan.innerHTML = `
           <h3>BMI ${bmi.toFixed(1)} — ${kategori.label}</h3>
-          <p>${data.saran || ""}</p>
+          <p>${data.insight || ""}</p>
+          ${kategoriHtml ? `<div>${kategoriHtml}</div>` : ""}
+          ${rekomendasiHtml ? `<ul>${rekomendasiHtml}</ul>` : ""}
+          ${data.perlu_konsultasi_dokter ? "<p><strong>Disarankan berkonsultasi dengan tenaga medis.</strong></p>" : ""}
         `;
       }
 
