@@ -26,6 +26,10 @@ def get_pengaturan():
 def halaman_kripto():
     return render_template("index_crypto.html")
 
+@app.route('/kesehatan')
+def halaman_kesehatan():
+    return render_template("kesehatan.html")
+
 @app.route('/api/kesehatan', methods=['POST'])
 def api_kesehatan():
     data = request.get_json(silent=True) or {}

@@ -275,9 +275,10 @@
 
   .btn-crypto { display: inline-block; text-decoration: none; }
   .analisa-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem; }
-  .analisa-layout { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: start; }
-  .analisa-pasar { text-align: right; }
-  .analisa-pasar h2 { margin-bottom: 0.8rem; }
+  .analisa-actions-center { justify-content: center; }
+  .analisa-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: start; }
+  .analisa-kolom { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; }
+  .analisa-kolom h2 { margin-bottom: 0; }
 
   .hasil-ai {
     margin-top: 1rem;
@@ -350,8 +351,7 @@
   @media (max-width: 480px) {
     .statistik { grid-template-columns: 1fr; }
     .struk { padding: 2.25rem 1.25rem 1.5rem; }
-    .analisa-layout { grid-template-columns: 1fr; gap: 1rem; }
-    .analisa-pasar { text-align: left; }
+    .analisa-layout { grid-template-columns: 1fr; gap: 1.25rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -473,13 +473,15 @@
     <!-- ================= ANALISA BULANAN ================= -->
     <section class="panel" aria-label="Analisa bulanan">
       <div class="analisa-layout">
-        <div>
+        <div class="analisa-kolom">
           <h2>Analisa Bulanan</h2>
-          <div class="analisa-actions">
-            <button id="btn-analisa" class="btn btn-sekunder">Minta Analisa dari AI</button>
-          </div>
+          <button id="btn-analisa" class="btn btn-sekunder">Minta Analisa dari AI</button>
         </div>
-        <div class="analisa-pasar">
+        <div class="analisa-kolom">
+          <h2>Analisis Kesehatan</h2>
+          <a class="btn btn-sekunder btn-crypto" href="/kesehatan">Kesehatan</a>
+        </div>
+        <div class="analisa-kolom">
           <h2>Analisis Pasar</h2>
           <a class="btn btn-sekunder btn-crypto" href="/kripto">Grafik Crypto</a>
         </div>
