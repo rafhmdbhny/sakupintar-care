@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAKU PINTAR&CARE — Kesehatan</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #efebe0;
+    --paper-dark: #e3ddcb;
+    --ink: #24211d;
+    --carbon: #8a8375;
+    --carbon-light: #b8b2a0;
+    --merah: #a93226;
+    --hijau: #2f5d46;
+    --kuning: #a8721f;
+    --meja: #17140f;
+
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+    --radius: 2px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--meja);
+    background-image: radial-gradient(ellipse at 50% -10%, #2a251c 0%, var(--meja) 60%);
+    min-height: 100vh;
+  }
+
+  .meja { display: flex; justify-content: center; padding: 3rem 1rem 5rem; }
+
+  .struk {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    background: var(--paper);
+    padding: 2.75rem 2rem 2rem;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+
+  .struk::before, .struk::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; height: 12px;
+    background:
+      linear-gradient(-45deg, var(--paper) 6px, transparent 0),
+      linear-gradient(45deg, var(--paper) 6px, transparent 0);
+    background-size: 12px 12px;
+    background-repeat: repeat-x;
+  }
+  .struk::before { top: -12px; }
+  .struk::after  { bottom: -12px; transform: scaleY(-1); }
+
+  .struk-kepala { text-align: center; position: relative; }
+
+  .btn-gear {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--carbon-light);
+    background: var(--paper-dark);
+    color: var(--ink);
+    border-radius: 50%;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background 0.15s ease;
+  }
+  .btn-gear:hover { background: var(--ink); color: var(--paper); }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--carbon);
+    margin: 0 0 0.5rem;
+  }
+
+  .struk-kepala h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--carbon);
+    margin: 0.4rem 0 0;
+  }
+
+  .sobekan {
+    height: 2px;
+    margin: 1.75rem 0;
+    background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px);
+  }
+
+  .statistik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+  .box-stat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.9rem 0.75rem;
+    background: var(--paper-dark);
+    border: 1px solid var(--carbon-light);
+  }
+
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    color: var(--carbon);
+    text-transform: uppercase;
+  }
+
+  .angka { font-family: var(--font-mono); font-weight: 600; font-size: 1.15rem; }
+
+  .stempel {
+    position: absolute;
+    top: -10px; right: -10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.5rem;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    transform: rotate(12deg);
+    background: var(--paper);
+    white-space: nowrap;
+  }
+  .stempel-merah  { color: var(--merah); }
+  .stempel-kuning { color: var(--kuning); }
+  .stempel-hijau  { color: var(--hijau); }
+
+  .panel h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.35rem; }
+  .deskripsi { font-size: 0.85rem; color: var(--carbon); margin: 0 0 0.9rem; }
+
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--carbon-light);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.7rem;
+  }
+
+  textarea:focus, input:focus, button:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  textarea { resize: vertical; margin-bottom: 0.7rem; }
+
+  .baris-input { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .baris-input > * { flex: 1; min-width: 120px; }
+
+  .btn {
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 0.85rem; letter-spacing: 0.02em;
+    border: none; border-radius: var(--radius);
+    padding: 0.65rem 1.1rem; cursor: pointer;
+    transition: transform 0.08s ease;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .btn-utama { background: var(--ink); color: var(--paper); }
+  .btn-utama:hover { background: #3a352c; }
+
+  .btn-sekunder { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+  .btn-sekunder:hover { background: var(--paper-dark); }
+
+  .btn-crypto { display: inline-block; text-decoration: none; }
+  .analisa-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem; }
+  .analisa-layout { display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: start; }
+  .analisa-pasar { text-align: right; }
+  .analisa-pasar h2 { margin-bottom: 0.8rem; }
+
+  .hasil-ai {
+    margin-top: 1rem;
+    padding: 1rem 1rem 1rem 1.2rem;
+    background: var(--paper-dark);
+    border-left: 4px solid var(--ink);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+  .hasil-ai h3 { font-family: var(--font-display); font-size: 0.85rem; margin: 0 0 0.4rem; }
+  .hasil-ai p { margin: 0 0 0.4rem; }
+  .hasil-ai p:last-child { margin-bottom: 0; }
+  .hasil-ai.error { border-left-color: var(--merah); color: var(--merah); }
+
+  .ledger { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
+  .ledger th {
+    text-align: left; font-size: 0.65rem; letter-spacing: 0.04em;
+    color: var(--carbon); text-transform: uppercase;
+    border-bottom: 1px solid var(--ink); padding-bottom: 0.4rem;
+  }
+  .ledger td { padding: 0.45rem 0.3rem; border-bottom: 1px dashed var(--carbon-light); }
+  .rata-kanan { text-align: right; }
+  .kosong { font-size: 0.85rem; color: var(--carbon); font-style: italic; }
+
+  .struk-kaki { text-align: center; margin-top: 2rem; }
+  .struk-kaki p { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--carbon); }
+
+  @media (max-width: 480px) {
+    .statistik { grid-template-columns: 1fr; }
+    .struk { padding: 2.25rem 1.25rem 1.5rem; }
+    .analisa-layout { grid-template-columns: 1fr; gap: 1rem; }
+    .analisa-pasar { text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="meja">
+  <main class="struk">
+
+    <header class="struk-kepala">
+      <a class="btn-gear" href="{{ url_for('index') }}" aria-label="Kembali ke dashboard keuangan" title="Dashboard Keuangan">←</a>
+      <p class="eyebrow">TOKO KESEHATAN "SAKU PINTAR&CARE"</p>
+      <h1>SAKU PINTAR&&nbsp;CARE</h1>
+      <p class="tagline">asisten yang julid demi badan kamu tetap oke</p>
+    </header>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= 3 BOX STATISTIK ================= -->
+    <section class="statistik" aria-label="Ringkasan kesehatan">
+      <div class="box-stat">
+        <span class="label-mono">BMI KAMU</span>
+        <span class="angka" id="stat-bmi">—</span>
+      </div>
+      <div class="box-stat" id="box-kategori">
+        <span class="label-mono">KATEGORI</span>
+        <span class="angka" id="stat-kategori">Belum diisi</span>
+        <span class="stempel stempel-hijau" id="stempel-bmi" hidden>NORMAL</span>
+      </div>
+      <div class="box-stat">
+        <span class="label-mono">DANA DARURAT KESEHATAN</span>
+        <span class="angka" id="stat-dana">Rp0</span>
+      </div>
+    </section>
+
+    <!-- ================= CEK KESEHATAN ================= -->
+    <section class="panel" aria-label="Cek kesehatan">
+      <h2>Cek Kesehatan</h2>
+      <p class="deskripsi">Isi data badan kamu, biar AI bisa kasih saran — bukan cuma dinyinyirin soal duit doang.</p>
+
+      <form id="form-kesehatan">
+        <div class="baris-input">
+          <input type="number" name="umur" id="input-umur-k" placeholder="Umur (tahun)" min="0">
+          <input type="number" name="berat" id="input-berat-k" placeholder="Berat badan (kg)" step="0.1" min="0" required>
+          <input type="number" name="tinggi" id="input-tinggi-k" placeholder="Tinggi badan (cm)" step="0.1" min="0" required>
+        </div>
+        <textarea name="keluhan" id="input-keluhan" rows="2" placeholder="Ada keluhan? (mis. gampang capek, susah tidur, dll) — boleh dikosongkan"></textarea>
+        <button type="submit" class="btn btn-utama">Analisa Kesehatan</button>
+      </form>
+
+      <div id="hasil-kesehatan" class="hasil-ai" hidden></div>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= RIWAYAT CEK KESEHATAN ================= -->
+    <section class="panel" aria-label="Riwayat cek kesehatan">
+      <h2>Riwayat Cek Kesehatan</h2>
+      <table class="ledger" id="tabel-riwayat-kesehatan">
+        <thead>
+          <tr><th>Tanggal</th><th>BB / TB</th><th>BMI</th><th class="rata-kanan">Kategori</th></tr>
+        </thead>
+        <tbody id="tbody-riwayat-kesehatan"></tbody>
+      </table>
+      <p class="kosong" id="riwayat-kesehatan-kosong" hidden>Belum ada catatan kesehatan. Yuk cek kondisi kamu dulu.</p>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= DANA DARURAT KESEHATAN ================= -->
+    <section class="panel" aria-label="Dana darurat kesehatan">
+      <div class="analisa-layout">
+        <div>
+          <h2>Dana Darurat Kesehatan</h2>
+          <p class="deskripsi">Dihitung otomatis dari sebagian keuntungan aset digital kamu, dikurangi pengeluaran kategori "Kesehatan" yang sudah tercatat.</p>
+          <div class="analisa-actions">
+            <button id="btn-hitung-dana" class="btn btn-sekunder">Hitung Ulang</button>
+          </div>
+        </div>
+        <div class="analisa-pasar">
+          <h2>Keuangan Utama</h2>
+          <a class="btn btn-sekunder btn-crypto" href="{{ url_for('index') }}">Dashboard Keuangan</a>
+        </div>
+      </div>
+      <div id="hasil-dana" class="hasil-ai" hidden></div>
+    </section>
+
+    <footer class="struk-kaki">
+      <p>*** BADAN SEHAT, DOMPET SELAMAT ***</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const ENDPOINT_KESEHATAN    = "/api/kesehatan";
+  const ENDPOINT_DANA_DARURAT = "/api/dana-darurat";
+  const KEY_RIWAYAT           = "riwayat_kesehatan";
+
+  function formatRupiah(angka) {
+    return "Rp" + Number(angka || 0).toLocaleString("id-ID");
+  }
+
+  function hitungBMI(berat, tinggi) {
+    const tinggiM = tinggi / 100;
+    return berat / (tinggiM * tinggiM);
+  }
+
+  function kategoriBMI(bmi) {
+    if (bmi < 18.5) return { label: "Kurus", kelas: "stempel-kuning" };
+    if (bmi < 25)   return { label: "Normal", kelas: "stempel-hijau" };
+    if (bmi < 30)   return { label: "Gemuk", kelas: "stempel-kuning" };
+    return { label: "Obesitas", kelas: "stempel-merah" };
+  }
+
+  function muatRiwayatLocal() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY_RIWAYAT) || "[]");
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function simpanRiwayatLocal(entry) {
+    const data = muatRiwayatLocal();
+    data.unshift(entry);
+    localStorage.setItem(KEY_RIWAYAT, JSON.stringify(data.slice(0, 20)));
+  }
+
+  function renderRiwayatKesehatan() {
+    const data = muatRiwayatLocal();
+    const tbody = document.getElementById("tbody-riwayat-kesehatan");
+    const kosong = document.getElementById("riwayat-kesehatan-kosong");
+
+    if (!data.length) {
+      tbody.innerHTML = "";
+      kosong.hidden = false;
+      return;
+    }
+    kosong.hidden = true;
+    tbody.innerHTML = data.map(d => `
+      <tr>
+        <td>${d.tanggal}</td>
+        <td>${d.berat}kg / ${d.tinggi}cm</td>
+        <td>${Number(d.bmi).toFixed(1)}</td>
+        <td class="rata-kanan">${d.kategori}</td>
+      </tr>
+    `).join("");
+  }
+
+  function tampilkanStatUtama(bmi, kategori) {
+    document.getElementById("stat-bmi").textContent = bmi.toFixed(1);
+    document.getElementById("stat-kategori").textContent = kategori.label;
+    const stempel = document.getElementById("stempel-bmi");
+    stempel.hidden = false;
+    stempel.textContent = kategori.label.toUpperCase();
+    stempel.classList.remove("stempel-merah", "stempel-kuning", "stempel-hijau");
+    stempel.classList.add(kategori.kelas);
+  }
+
+  const formKesehatan = document.getElementById("form-kesehatan");
+  const hasilKesehatan = document.getElementById("hasil-kesehatan");
+
+  formKesehatan.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(formKesehatan);
+    const berat = parseFloat(formData.get("berat"));
+    const tinggi = parseFloat(formData.get("tinggi"));
+    const umur = formData.get("umur");
+    const keluhan = formData.get("keluhan");
+
+    if (!berat || !tinggi) return;
+
+    const bmi = hitungBMI(berat, tinggi);
+    const kategori = kategoriBMI(bmi);
+    tampilkanStatUtama(bmi, kategori);
+
+    const btn = formKesehatan.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Menganalisa...";
+    hasilKesehatan.hidden = true;
+
+    try {
+      const res = await fetch(ENDPOINT_KESEHATAN, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          umur, berat, tinggi, keluhan,
+          bmi: bmi.toFixed(1),
+          kategori: kategori.label
+        })
+      });
+      const data = await res.json();
+
+      hasilKesehatan.hidden = false;
+      hasilKesehatan.classList.toggle("error", !res.ok);
+
+      if (!res.ok) {
+        hasilKesehatan.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
+      } else {
+        hasilKesehatan.innerHTML = `
+          <h3>BMI ${bmi.toFixed(1)} — ${kategori.label}</h3>
+          <p>${data.saran || ""}</p>
+        `;
+      }
+
+      simpanRiwayatLocal({
+        tanggal: new Date().toLocaleDateString("id-ID"),
+        berat, tinggi, bmi, kategori: kategori.label
+      });
+      renderRiwayatKesehatan();
+
+    } catch (err) {
+      hasilKesehatan.hidden = false;
+      hasilKesehatan.classList.add("error");
+      hasilKesehatan.innerHTML = `<p>Gagal terhubung ke server.</p>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Analisa Kesehatan";
+    }
+  });
+
+  const btnHitungDana = document.getElementById("btn-hitung-dana");
+  const hasilDana = document.getElementById("hasil-dana");
+
+  async function muatDanaDarurat() {
+    btnHitungDana.disabled = true;
+    btnHitungDana.textContent = "Menghitung...";
+    hasilDana.hidden = true;
+
+    try {
+      const res = await fetch(ENDPOINT_DANA_DARURAT);
+      const data = await res.json();
+
+      hasilDana.hidden = false;
+      hasilDana.classList.toggle("error", !res.ok);
+
+      if (!res.ok) {
+        hasilDana.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
+      } else {
+        document.getElementById("stat-dana").textContent = formatRupiah(data.sisa);
+        hasilDana.innerHTML = `
+          <h3>Rincian Dana Darurat Kesehatan</h3>
+          <p>Keuntungan bulan ini: ${formatRupiah(data.keuntungan)}</p>
+          <p>Dialokasikan (10%): ${formatRupiah(data.alokasi)}</p>
+          <p>Sudah terpakai (transaksi kategori Kesehatan): ${formatRupiah(data.terpakai)}</p>
+          <p><strong>Sisa dana darurat: ${formatRupiah(data.sisa)}</strong></p>
+        `;
+      }
+    } catch (err) {
+      hasilDana.hidden = false;
+      hasilDana.classList.add("error");
+      hasilDana.innerHTML = `<p>Gagal terhubung ke server.</p>`;
+    } finally {
+      btnHitungDana.disabled = false;
+      btnHitungDana.textContent = "Hitung Ulang";
+    }
+  }
+
+  btnHitungDana.addEventListener("click", muatDanaDarurat);
+
+  renderRiwayatKesehatan();
+  muatDanaDarurat();
+</script>
+
+</body>
+</html>

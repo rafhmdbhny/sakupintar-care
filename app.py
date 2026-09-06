@@ -1,5 +1,6 @@
 
 from Services.Crypto_System import Ambil_dan_simpan_harga, Analisa_kripto
+from Services.Health_System import Analisa_kesehatan
 from Services.Ai_Service import generate_response
 from flask import Flask, request, jsonify, render_template
 import datetime as dt
@@ -24,6 +25,22 @@ def get_pengaturan():
 @app.route('/kripto')
 def halaman_kripto():
     return render_template("index_crypto.html")
+
+@app.route('/api/kesehatan', methods=['POST'])
+def api_kesehatan():
+    data = request.get_json(silent=True) or {}
+    try:
+        hasil = Analisa_kesehatan(
+            umur=data.get('umur'),
+            berat=data.get('berat'),
+            tinggi=data.get('tinggi'),
+            bmi=data.get('bmi'),
+            kategori_bmi=data.get('kategori'),
+            keluhan=data.get('keluhan'),
+        )
+        return jsonify(hasil.model_dump())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/update-harga-kripto', methods=['POST'])
 def update_harga_kripto():
