@@ -71,26 +71,26 @@ finance_config = genai.types.GenerateContentConfig(
     response_mime_type="application/json",
 )
 
-PENGATURAN_PATH = os.path.join(PROJECT_ROOT, "Pengaturan.json")
-
-def Read_pengaturan():
-    if os.path.exists(PENGATURAN_PATH):
-        with open(PENGATURAN_PATH, "r") as f:
+def Read_pengaturan(username):
+    path = os.path.join(PROJECT_ROOT, f"Pengaturan_{username}.json")
+    if os.path.exists(path):
+        with open(path, "r") as f:
             return json.load(f)
     default = {"budget_bulanan": 0, "umur": None, "berat_badan": None, "tinggi_badan": None}
-    with open(PENGATURAN_PATH, "w") as f:
+    with open(path, "w") as f:
         json.dump(default, f)
     return default
 
 
-def Save_pengaturan(budget_bulanan, umur, berat_badan, tinggi_badan):
+def Save_pengaturan(username, budget_bulanan, umur, berat_badan, tinggi_badan):
+    path = os.path.join(PROJECT_ROOT, f"Pengaturan_{username}.json")
     data = {
         "budget_bulanan": budget_bulanan,
         "umur": umur,
         "berat_badan": berat_badan,
         "tinggi_badan": tinggi_badan,
     }
-    with open(PENGATURAN_PATH, "w") as f:
+    with open(path, "w") as f:
         json.dump(data, f)
 
 
@@ -111,13 +111,12 @@ def bangun_konteks_kesehatan(pengaturan):
     )
 
 #Sistem keuangan utama letak=di atas dashboard
-def Main_system_keuangan_(inputan_user, img):
-    pengaturan = Read_pengaturan()
+def Main_system_keuangan_(inputan_user, img, username):
+    pengaturan = Read_pengaturan(username)
     konteks = bangun_konteks_kesehatan(pengaturan)
 
     if inputan_user == "":
         foto_struk = Image.open(img)
-        # kalau ada foto, konteks teks digabung sebagai elemen terpisah dalam list
         contents = [foto_struk, konteks] if konteks else [foto_struk]
         response = generate_response(contents, finance_config)
     else:
@@ -125,8 +124,8 @@ def Main_system_keuangan_(inputan_user, img):
     return response.parsed
     
 #analisa data transaksi dari csv letak=di bawah dashboard
-def Analisa_menyeluruh():
-    df_transaksi = Read_riwayat_transaksi()
+def Analisa_menyeluruh(username):
+    df_transaksi = Read_riwayat_transaksi(username)
     csv_kripto = os.path.join(PROJECT_ROOT, "Data_kripto.csv")
     df_kripto = pd.read_csv(csv_kripto) if os.path.exists(csv_kripto) else pd.DataFrame()
 
@@ -151,8 +150,8 @@ def Analisa_menyeluruh():
 
 
 #Read csv
-def Read_riwayat_transaksi():
-    csv_transaksi = os.path.join(PROJECT_ROOT, "Data_transaksi.csv")
+def Read_riwayat_transaksi(username):
+    csv_transaksi = os.path.join(PROJECT_ROOT, f"Data_transaksi_{username}.csv")
     if os.path.exists(csv_transaksi):
         df = pd.read_csv(csv_transaksi)
         return df
@@ -162,43 +161,43 @@ def Read_riwayat_transaksi():
         return df_kosong
 
 #Save To csv
-def save_riwayat_transaksi(now, nama, jumlah, harga, kartegori):
+def save_riwayat_transaksi(username, now, nama, jumlah, harga, kartegori):
     now = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    df = Read_riwayat_transaksi()
+    df = Read_riwayat_transaksi(username)
     new_data = pd.DataFrame({"Tanggal": [now], "Nama": [nama], "Jumlah": [jumlah], "Harga": [harga], "kartegori": [kartegori] })
     df = pd.concat([df, new_data], ignore_index=True)
-    df.to_csv(os.path.join(PROJECT_ROOT, "Data_transaksi.csv"), index=False, encoding="utf-8")
+    df.to_csv(os.path.join(PROJECT_ROOT, f"Data_transaksi_{username}.csv"), index=False, encoding="utf-8")
 
     if kartegori == "Kesehatan":
-        data_dana = Read_dana_darurat()
+        data_dana = Read_dana_darurat(username)
         pengurangan = float(harga) * float(jumlah)
-        Save_dana_darurat(max(float(data_dana.get("saldo", 0)) - pengurangan, 0))
+        saldo_baru = max(float(data_dana.get("saldo", 0)) - pengurangan, 0)
+        Save_dana_darurat(username, saldo_baru)
 
 
-DANA_DARURAT_PATH = os.path.join(PROJECT_ROOT, "Dana_darurat.json")
-
-
-def Read_dana_darurat():
-    if os.path.exists(DANA_DARURAT_PATH):
+def Read_dana_darurat(username):
+    path = os.path.join(PROJECT_ROOT, f"Dana_darurat_{username}.json")
+    if os.path.exists(path):
         try:
-            with open(DANA_DARURAT_PATH, "r", encoding="utf-8") as file:
+            with open(path, "r", encoding="utf-8") as file:
                 data = json.load(file)
             return {"saldo": max(float(data.get("saldo", 0)), 0)}
         except (OSError, ValueError, TypeError):
             pass
 
     default = {"saldo": 0}
-    Save_dana_darurat(0)
+    Save_dana_darurat(username, 0)
     return default
 
 
-def Save_dana_darurat(saldo):
-    with open(DANA_DARURAT_PATH, "w", encoding="utf-8") as file:
+def Save_dana_darurat(username, saldo):
+    path = os.path.join(PROJECT_ROOT, f"Dana_darurat_{username}.json")
+    with open(path, "w", encoding="utf-8") as file:
         json.dump({"saldo": max(float(saldo), 0)}, file)
 
 
-def _hitung_alokasi_dana_darurat():
+def _hitung_alokasi_dana_darurat(username):
     csv_kripto = os.path.join(PROJECT_ROOT, "Data_kripto.csv")
     keuntungan = 0
 
@@ -215,9 +214,9 @@ def _hitung_alokasi_dana_darurat():
     return keuntungan * 0.1
 
 
-def Ambil_saldo_dana_darurat():
-    alokasi_tersedia = _hitung_alokasi_dana_darurat()
-    saldo = Read_dana_darurat()["saldo"]
+def Ambil_saldo_dana_darurat(username):
+    alokasi_tersedia = _hitung_alokasi_dana_darurat(username)
+    saldo = Read_dana_darurat(username)["saldo"]
     return {
         "keuntungan": alokasi_tersedia / 0.1,
         "alokasi": alokasi_tersedia,
@@ -227,10 +226,10 @@ def Ambil_saldo_dana_darurat():
     }
 
 
-def Alokasikan_dana_darurat():
-    alokasi = _hitung_alokasi_dana_darurat()
-    saldo_baru = Read_dana_darurat()["saldo"] + alokasi
-    Save_dana_darurat(saldo_baru)
+def Alokasikan_dana_darurat(username):
+    alokasi = _hitung_alokasi_dana_darurat(username)
+    saldo_baru = Read_dana_darurat(username)["saldo"] + alokasi
+    Save_dana_darurat(username, saldo_baru)
     return {
         "alokasi": alokasi,
         "saldo": saldo_baru,
@@ -239,8 +238,8 @@ def Alokasikan_dana_darurat():
 
 
 #total pengeluaran dan rata-rata pengeluaran letak=di atas dashboard dipisah menjadi 3 box
-def Analisis_riwayat_transaksi(budget):
-    df = Read_riwayat_transaksi()
+def Analisis_riwayat_transaksi(username, budget):
+    df = Read_riwayat_transaksi(username)
     if df.empty:
         return 0, 0, 0
     total_pengeluaran = float(df['Harga'].sum())
@@ -294,4 +293,44 @@ def Analisa_kesehatan(umur, berat, tinggi, bmi, kategori_bmi, keluhan):
     """
     response = generate_response(contents, kesehatan_config)
     return response.parsed
+
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
+USERS_PATH = os.path.join(PROJECT_ROOT, "Users.json")
+
+
+def Read_users():
+    if os.path.exists(USERS_PATH):
+        with open(USERS_PATH, "r") as f:
+            return json.load(f)
+    default = {}
+    with open(USERS_PATH, "w") as f:
+        json.dump(default, f)
+    return default
+
+
+def Save_users(data):
+    with open(USERS_PATH, "w") as f:
+        json.dump(data, f)
+
+
+def Daftar_user(username, password):
+    users = Read_users()
+    if username in users:
+        return False, "Username sudah dipakai."
+
+    users[username] = {
+        "password_hash": generate_password_hash(password)
+    }
+    Save_users(users)
+    return True, "Berhasil daftar."
+
+
+def Cek_login(username, password):
+    users = Read_users()
+    if username not in users:
+        return False
+
+    return check_password_hash(users[username]["password_hash"], password)
 

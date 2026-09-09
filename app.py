@@ -1,7 +1,9 @@
-
+from flask import session, redirect, url_for
+from Services.Main_system import Daftar_user, Cek_login
 from Services.Crypto_System import Ambil_dan_simpan_harga, Analisa_kripto
 from Services.Ai_Service import generate_response
 from flask import Flask, request, jsonify, render_template
+from functools import wraps
 import datetime as dt
 import os
 from Services.Main_system import (
@@ -18,19 +20,34 @@ from Services.Main_system import (
 )
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-only-change-this-key")
+app.secret_key = os.environ.get("SECRET_KEY", "ganti-ini-dengan-kata-rahasia-kamu-sendiri")
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
 
 @app.route('/pengaturan', methods=['GET'])
 def get_pengaturan():
-    return jsonify(Read_pengaturan())
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
+    return jsonify(Read_pengaturan(username))
 
 @app.route('/kripto')
+@login_required
 def halaman_kripto():
     return render_template("index_crypto.html")
 
 @app.route('/kesehatan')
+@login_required
 def halaman_kesehatan():
-    return render_template("kesehatan.html")
+    return render_template("index_kesehatan.html")
 
 @app.route('/api/kesehatan', methods=['POST'])
 def api_kesehatan():
@@ -50,15 +67,21 @@ def api_kesehatan():
 
 @app.route('/api/dana-darurat')
 def api_dana_darurat():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     try:
-        return jsonify(Ambil_saldo_dana_darurat())
+        return jsonify(Ambil_saldo_dana_darurat(username))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/dana-darurat/alokasikan', methods=['POST'])
 def api_alokasikan_dana():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     try:
-        return jsonify(Alokasikan_dana_darurat())
+        return jsonify(Alokasikan_dana_darurat(username))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -91,6 +114,9 @@ def analisa_kripto():
 
 @app.route('/pengaturan', methods=['POST'])
 def set_pengaturan():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     try:
         budget = int(request.form.get('budget_bulanan', 0))
         umur = int(request.form.get('umur')) if request.form.get('umur') else None
@@ -99,16 +125,54 @@ def set_pengaturan():
     except ValueError:
         return jsonify({"error": "Data harus berupa angka."}), 400
 
-    Save_pengaturan(budget, umur, berat, tinggi)
+    Save_pengaturan(username, budget, umur, berat, tinggi)
     return jsonify({"status": "ok"})
 
 @app.route('/')
+@login_required
 def index():
     return render_template("index_main.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if Cek_login(username, password):
+            session["username"] = username
+            return redirect(url_for("index"))
+        else:
+            return render_template("login.html", error="Username atau password salah.")
+
+    return render_template("login.html")
+
+@app.route("/daftar", methods=["GET", "POST"])
+def daftar():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        berhasil, pesan = Daftar_user(username, password)
+        if berhasil:
+            session["username"] = username
+            return redirect(url_for("index"))
+        else:
+            return render_template("daftar.html", error=pesan)
+
+    return render_template("daftar.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return redirect(url_for("login"))
 
 
 @app.route('/tanya', methods=['POST'])
 def tanya():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     now = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
     pertanyaan = request.form.get('pertanyaan', '')
     img = request.files.get('foto')
@@ -118,9 +182,9 @@ def tanya():
 
     try:
         if pertanyaan.strip():
-            hasil = Main_system_keuangan_(pertanyaan, None)
+            hasil = Main_system_keuangan_(pertanyaan, None, username)
         else:
-            hasil = Main_system_keuangan_('', img)
+            hasil = Main_system_keuangan_('', img, username)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -130,6 +194,7 @@ def tanya():
     if hasil.nama_transaksi and hasil.harga is not None:
         kartegori = hasil.kategori[0] if hasil.kategori else "Lainnya"
         save_riwayat_transaksi(
+            username=username,
             now=now,
             nama=hasil.nama_transaksi,
             jumlah=1,
@@ -142,6 +207,9 @@ def tanya():
 
 @app.route('/transaksi', methods=['POST'])
 def transaksi():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     now = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
     nama = request.form.get('nama', '').strip()
     kartegori = request.form.get('kartegori', 'Lainnya')
@@ -155,13 +223,16 @@ def transaksi():
     if not nama:
         return jsonify({"error": "Nama transaksi wajib diisi."}), 400
 
-    save_riwayat_transaksi(now=now, nama=nama, jumlah=jumlah, harga=harga, kartegori=kartegori)
+    save_riwayat_transaksi(username=username, now=now, nama=nama, jumlah=jumlah, harga=harga, kartegori=kartegori)
     return jsonify({"status": "ok"})
 
 @app.route('/analisa-menyeluruh')
 def analisa_menyeluruh():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
     try:
-        hasil = Analisa_menyeluruh()
+        hasil = Analisa_menyeluruh(username)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -172,14 +243,20 @@ def analisa_menyeluruh():
 
 @app.route('/statistik')
 def statistik():
-    pengaturan = Read_pengaturan()
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
+    pengaturan = Read_pengaturan(username)
     budget = pengaturan.get("budget_bulanan", 0)
-    total, rata_rata, persen = Analisis_riwayat_transaksi(budget)
+    total, rata_rata, persen = Analisis_riwayat_transaksi(username, budget)
     return jsonify({"total": total, "rata_rata": rata_rata, "persen": persen, "budget": budget})
 
 @app.route('/riwayat')
 def riwayat():
-    df = Read_riwayat_transaksi()
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
+    df = Read_riwayat_transaksi(username)
     return jsonify(df.to_dict(orient="records"))
 
 @app.route('/api/chat', methods=['POST'])

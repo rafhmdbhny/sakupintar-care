@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — SAKU PINTAR&CARE</title>
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #efebe0;
+    --paper-dark: #e3ddcb;
+    --ink: #24211d;
+    --carbon: #8a8375;
+    --carbon-light: #b8b2a0;
+    --merah: #a93226;
+    --hijau: #2f5d46;
+    --meja: #17140f;
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+    --radius: 2px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--meja);
+    background-image: radial-gradient(ellipse at 50% -10%, #2a251c 0%, var(--meja) 60%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .struk {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: var(--paper);
+    padding: 2.5rem 2rem;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+  .struk::before, .struk::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; height: 12px;
+    background:
+      linear-gradient(-45deg, var(--paper) 6px, transparent 0),
+      linear-gradient(45deg, var(--paper) 6px, transparent 0);
+    background-size: 12px 12px;
+    background-repeat: repeat-x;
+  }
+  .struk::before { top: -12px; }
+  .struk::after  { bottom: -12px; transform: scaleY(-1); }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--carbon);
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-align: center;
+    margin: 0 0 1.75rem;
+  }
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--carbon);
+    margin: 0 0 0.3rem;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--carbon-light);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.7rem;
+    margin-bottom: 1.1rem;
+  }
+  input:focus, button:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+  .btn {
+    width: 100%;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    cursor: pointer;
+  }
+  .btn:hover { background: #3a352c; }
+  .pesan-error {
+    background: var(--paper-dark);
+    border-left: 4px solid var(--merah);
+    color: var(--merah);
+    font-size: 0.82rem;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .link-bawah {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--carbon);
+    margin-top: 1.25rem;
+  }
+  .link-bawah a { color: var(--ink); font-weight: 600; text-decoration: none; }
+  .link-bawah a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <main class="struk">
+    <p class="eyebrow">SAKU PINTAR&CARE</p>
+    <h1>Masuk ke Akun</h1>
+
+    {% if error %}
+    <div class="pesan-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <label class="field-label" for="username">Username</label>
+      <input type="text" name="username" id="username" required autofocus>
+
+      <label class="field-label" for="password">Password</label>
+      <input type="password" name="password" id="password" required>
+
+      <button type="submit" class="btn">Masuk</button>
+    </form>
+
+    <p class="link-bawah">Belum punya akun? <a href="/daftar">Daftar di sini</a></p>
+  </main>
+</body>
+</html>

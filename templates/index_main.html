@@ -39,6 +39,35 @@
     min-height: 100vh;
   }
 
+  .user-bar {
+    max-width: 760px;
+    margin: 1rem auto 0;
+    padding: 0.7rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: center;
+    background: rgba(239, 235, 224, 0.94);
+    border: 1px solid var(--carbon-light);
+    box-shadow: 0 16px 30px -18px rgba(0, 0, 0, 0.6);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
+
+  .user-bar strong { font-family: var(--font-display); letter-spacing: 0.04em; }
+
+  .logout-link {
+    color: var(--ink);
+    text-decoration: none;
+    border: 1px solid var(--ink);
+    padding: 0.4rem 0.7rem;
+    font-weight: 700;
+  }
+
+  .logout-link:hover { background: var(--paper-dark); }
+
   .meja { display: flex; justify-content: center; padding: 3rem 1rem 5rem; }
 
   .struk {
@@ -360,6 +389,11 @@
 </style>
 </head>
 <body>
+
+<div class="user-bar">
+  <span>Halo, <strong>{{ session.get('username', 'Pengguna') }}</strong></span>
+  <a class="logout-link" href="/logout">Logout</a>
+</div>
 
 <div class="meja">
   <main class="struk">
