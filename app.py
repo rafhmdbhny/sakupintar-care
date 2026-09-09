@@ -17,6 +17,7 @@ from Services.Main_system import (
     Analisa_kesehatan,
     Ambil_saldo_dana_darurat,
     Alokasikan_dana_darurat,
+    Setor_manual_dana_darurat,
 )
 
 app = Flask(__name__)
@@ -82,6 +83,18 @@ def api_alokasikan_dana():
         return jsonify({"error": "Login diperlukan."}), 401
     try:
         return jsonify(Alokasikan_dana_darurat(username))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/dana-darurat/setor', methods=['POST'])
+def api_setor_dana():
+    username = session.get("username")
+    if not username:
+        return jsonify({"error": "Login diperlukan."}), 401
+    try:
+        jumlah = float(request.form.get("jumlah", 0))
+        hasil = Setor_manual_dana_darurat(username, jumlah)
+        return jsonify(hasil)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

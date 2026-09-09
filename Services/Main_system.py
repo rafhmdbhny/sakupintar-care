@@ -237,6 +237,13 @@ def Alokasikan_dana_darurat(username):
     }
 
 
+def Setor_manual_dana_darurat(username, jumlah):
+    data = Read_dana_darurat(username)
+    saldo_baru = data.get("saldo", 0) + float(jumlah)
+    Save_dana_darurat(username, saldo_baru)
+    return {"saldo": saldo_baru}
+
+
 #total pengeluaran dan rata-rata pengeluaran letak=di atas dashboard dipisah menjadi 3 box
 def Analisis_riwayat_transaksi(username, budget):
     df = Read_riwayat_transaksi(username)

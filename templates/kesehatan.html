@@ -342,9 +342,19 @@
         <div>
           <h2>Dana Darurat Kesehatan</h2>
           <p class="deskripsi">Dihitung otomatis dari sebagian keuntungan aset digital kamu, dikurangi pengeluaran kategori "Kesehatan" yang sudah tercatat.</p>
+
+          <div class="box-stat" style="margin-bottom: 0.8rem;">
+            <span class="label-mono">Saldo Saat Ini</span>
+            <span class="angka" id="saldo-saat-ini">Rp0</span>
+          </div>
+
           <div class="analisa-actions">
             <button id="btn-hitung-dana" class="btn btn-sekunder">Hitung Ulang</button>
             <button id="btn-alokasikan-dana" class="btn btn-utama">Alokasikan</button>
+          </div>
+          <div class="baris-input" style="margin-top: 0.8rem;">
+            <input type="number" id="input-setor-manual" placeholder="Setor manual (Rp)" min="0">
+            <button id="btn-setor-manual" class="btn btn-sekunder">Setor</button>
           </div>
         </div>
         <div class="analisa-pasar">
@@ -520,12 +530,14 @@
       if (!res.ok) {
         hasilDana.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
       } else {
-        document.getElementById("stat-dana").textContent = formatRupiah(data.sisa);
+        const saldoSekarang = data.saldo ?? data.sisa;
+        document.getElementById("stat-dana").textContent = formatRupiah(saldoSekarang);
+        document.getElementById("saldo-saat-ini").textContent = formatRupiah(saldoSekarang);
         hasilDana.innerHTML = `
           <h3>Rincian Dana Darurat Kesehatan</h3>
           <p>Keuntungan bulan ini: ${formatRupiah(data.keuntungan)}</p>
           <p>Alokasi tersedia (10%): ${formatRupiah(data.alokasi)}</p>
-          <p>Saldo tersimpan: ${formatRupiah(data.saldo ?? data.sisa)}</p>
+          <p>Saldo tersimpan: ${formatRupiah(saldoSekarang)}</p>
           <p><strong>Sisa dana darurat: ${formatRupiah(data.sisa)}</strong></p>
         `;
       }
@@ -557,6 +569,29 @@
     } finally {
       btnAlokasikanDana.disabled = false;
       btnAlokasikanDana.textContent = "Alokasikan";
+    }
+  });
+
+  document.getElementById("btn-setor-manual").addEventListener("click", async () => {
+    const jumlah = document.getElementById("input-setor-manual").value;
+    if (!jumlah || jumlah <= 0) return;
+
+    const formData = new FormData();
+    formData.append("jumlah", jumlah);
+
+    try {
+      const res = await fetch("/api/dana-darurat/setor", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById("stat-dana").textContent = formatRupiah(data.saldo);
+        document.getElementById("saldo-saat-ini").textContent = formatRupiah(data.saldo);
+        document.getElementById("input-setor-manual").value = "";
+        await muatDanaDarurat();
+      } else {
+        throw new Error(data.error || "Gagal setor dana.");
+      }
+    } catch (err) {
+      alert("Gagal terhubung ke server.");
     }
   });
 
