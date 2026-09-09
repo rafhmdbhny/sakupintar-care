@@ -47,7 +47,7 @@ def halaman_kripto():
 @app.route('/kesehatan')
 @login_required
 def halaman_kesehatan():
-    return render_template("index_kesehatan.html")
+    return render_template("kesehatan.html")
 
 @app.route('/api/kesehatan', methods=['POST'])
 def api_kesehatan():
