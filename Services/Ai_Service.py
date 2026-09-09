@@ -23,4 +23,7 @@ def generate_response(contents, config=None):
         )
         return response if config is not None else response.text
     except Exception as e:
+        message = str(e)
+        if "UNAVAILABLE" in message or "503" in message or "temporarily unavailable" in message.lower():
+            raise RuntimeError("Server AI sedang sibuk, coba beberapa saat lagi ya.")
         raise RuntimeError(f"Failed to generate response: {e}")
