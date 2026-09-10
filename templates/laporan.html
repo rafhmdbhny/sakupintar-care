@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan — Saku Pintar & Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root {
+    --paper: #efebe0;
+    --paper-dark: #e3ddcb;
+    --ink: #24211d;
+    --carbon: #8a8375;
+    --carbon-light: #b8b2a0;
+    --merah: #a93226;
+    --hijau: #2f5d46;
+    --kuning: #a8721f;
+    --meja: #4b352d;
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--meja);
+    background-image: linear-gradient(135deg, rgba(130, 99, 80, 0.18), transparent 38%), radial-gradient(ellipse at 50% -10%, #6b4c3d 0%, var(--meja) 64%);
+  }
+
+  .site-navbar {
+    width: min(1280px, calc(100% - 2rem));
+    margin: 1.25rem auto 0;
+    padding: 0.85rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(239, 235, 224, 0.96);
+    border: 1px solid rgba(138, 131, 117, 0.45);
+    box-shadow: 0 18px 32px -24px rgba(0, 0, 0, 0.7);
+    border-radius: 14px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .navbar-brand {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a,
+  .nav-logout {
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--carbon);
+    padding: 0.45rem 0.75rem;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+  }
+
+  .nav-links a:hover,
+  .nav-logout:hover { color: var(--ink); }
+
+  .nav-links a.active {
+    color: var(--ink);
+    background: var(--paper-dark);
+    border-color: rgba(138, 131, 117, 0.45);
+  }
+
+  .nav-logout {
+    color: var(--merah);
+    border-bottom: 1px dashed currentColor;
+    padding-right: 0;
+    padding-left: 0;
+    white-space: nowrap;
+  }
+
+  .meja { display: flex; justify-content: center; padding: 3rem 1rem 5rem; }
+
+  .struk {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    background: linear-gradient(180deg, rgba(239,235,224,1) 0%, rgba(245,241,232,1) 100%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 22px;
+    padding: 3rem clamp(1.25rem, 4vw, 3.5rem) 2.5rem;
+    box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.72);
+  }
+
+  .struk-kepala { text-align: center; position: relative; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--carbon);
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    letter-spacing: 0.02em;
+  }
+
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--carbon);
+    margin: 0.5rem 0 0;
+  }
+
+  .sobekan {
+    height: 2px;
+    margin: 1.75rem 0;
+    background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .summary-card {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(138, 131, 117, 0.2);
+    border-radius: 16px;
+    padding: 1rem 1rem 0.95rem;
+    box-shadow: 0 12px 20px -18px rgba(0,0,0,0.4);
+  }
+
+  .summary-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--carbon);
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2vw, 1.7rem);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .summary-mini {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(47, 93, 70, 0.08);
+    color: var(--green);
+  }
+
+  .grid-grafik {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .kartu-grafik {
+    background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(233, 227, 213, 0.72));
+    border: 1px solid rgba(138, 131, 117, 0.28);
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: 0 18px 28px -22px rgba(0, 0, 0, 0.4);
+  }
+
+  .kartu-grafik h3 {
+    margin: 0 0 0.85rem;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .kartu-grafik .wrapper-canvas {
+    position: relative;
+    height: 250px;
+  }
+
+  .panel {
+    margin-top: 1.75rem;
+    padding: 1.25rem;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(138, 131, 117, 0.22);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  .panel h2 {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .ledger th {
+    text-align: left;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    color: var(--carbon);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.5rem;
+  }
+
+  .ledger td {
+    padding: 0.5rem 0.3rem;
+    border-bottom: 1px dashed var(--carbon-light);
+  }
+
+  .rata-kanan { text-align: right; }
+  .kosong {
+    margin: 0.9rem 0 0;
+    font-size: 0.85rem;
+    color: var(--carbon);
+    font-style: italic;
+  }
+
+  @media (max-width: 760px) {
+    .site-navbar {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+
+    .summary-grid,
+    .grid-grafik {
+      grid-template-columns: 1fr;
+    }
+
+    .struk {
+      padding: 2.25rem 1.25rem 1.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-navbar">
+  <div class="navbar-brand">SAKU PINTAR &amp; CARE</div>
+  <nav class="nav-links" aria-label="Navigasi utama">
+    <a href="/">Keuangan</a>
+    <a href="/kesehatan">Kesehatan</a>
+    <a href="/laporan" class="active">Laporan</a>
+    <a href="/kripto">Kripto</a>
+  </nav>
+  <a href="/logout" class="nav-logout">Keluar</a>
+</header>
+
+<div class="meja">
+  <main class="struk">
+    <header class="struk-kepala">
+      <p class="eyebrow">Halaman Laporan</p>
+      <h1>Laporan &amp; Grafik</h1>
+      <p class="tagline">Visualisasi pengeluaran dan tren transaksi Anda</p>
+    </header>
+
+    <div class="sobekan"></div>
+
+    <section class="summary-grid" aria-label="Ringkasan pengeluaran">
+      <div class="summary-card">
+        <div class="summary-label">Total pengeluaran</div>
+        <p id="total-keluar" class="summary-value">Rp0</p>
+        <span class="summary-mini" id="total-mini">--</span>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Rata-rata / transaksi</div>
+        <p id="rata-transaksi" class="summary-value">Rp0</p>
+        <span class="summary-mini" id="rata-mini">--</span>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Persentase budget</div>
+        <p id="persen-budget" class="summary-value">0%</p>
+        <span class="summary-mini" id="status-budget">AMAN</span>
+      </div>
+    </section>
+
+    <section class="grid-grafik" aria-label="Grafik pengeluaran">
+      <div class="kartu-grafik">
+        <h3>Pengeluaran per Kategori</h3>
+        <div class="wrapper-canvas"><canvas id="chart-kategori"></canvas></div>
+      </div>
+      <div class="kartu-grafik">
+        <h3>Tren Pengeluaran per Tanggal</h3>
+        <div class="wrapper-canvas"><canvas id="chart-tren"></canvas></div>
+      </div>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <section class="panel" aria-label="Riwayat transaksi lengkap">
+      <h2>Riwayat Transaksi</h2>
+      <table class="ledger" id="tabel-riwayat">
+        <thead>
+          <tr><th>Tanggal</th><th>Nama</th><th>Kategori</th><th class="rata-kanan">Harga</th></tr>
+        </thead>
+        <tbody id="tbody-riwayat"></tbody>
+      </table>
+      <p class="kosong" id="riwayat-kosong" hidden>Belum ada transaksi tercatat.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const PALET_WARNA = ["#24211d", "#a93226", "#2f5d46", "#a8721f", "#8a8375", "#5c6b8a", "#7a4f8a", "#3a7a6b"];
+  let chartKategori = null;
+  let chartTren = null;
+
+  function formatRupiah(angka) {
+    return "Rp" + Number(angka || 0).toLocaleString("id-ID");
+  }
+
+  function tampilkanRingkasan(data) {
+    const total = Number(data?.total || 0);
+    const rata = Number(data?.rata_rata || 0);
+    const persen = Number(data?.persen || 0);
+    const budget = Number(data?.budget || 0);
+
+    document.getElementById("total-keluar").textContent = formatRupiah(total);
+    document.getElementById("rata-transaksi").textContent = formatRupiah(rata);
+    document.getElementById("persen-budget").textContent = `${persen.toFixed(1)}%`;
+
+    const status = document.getElementById("status-budget");
+    status.textContent = persen >= 100 ? "AWAS" : persen >= 70 ? "HATI-HATI" : "AMAN";
+    status.style.background = persen >= 100 ? "rgba(169, 50, 38, 0.12)" : persen >= 70 ? "rgba(168, 114, 31, 0.12)" : "rgba(47, 93, 70, 0.08)";
+    status.style.color = persen >= 100 ? "#a93226" : persen >= 70 ? "#a8721f" : "#2f5d46";
+
+    document.getElementById("total-mini").textContent = budget > 0 ? `dari budget ${formatRupiah(budget)}` : "belum ada budget";
+    document.getElementById("rata-mini").textContent = `~ ${data?.jumlah ?? 0} transaksi`;
+  }
+
+  async function muatRingkasanStatistik() {
+    try {
+      const res = await fetch("/statistik");
+      if (!res.ok) return;
+      const data = await res.json();
+      tampilkanRingkasan(data);
+    } catch (err) {
+      // diamkan jika gagal
+    }
+  }
+
+  async function muatLaporan() {
+    try {
+      const res = await fetch("/riwayat");
+      if (!res.ok) return;
+      const data = await res.json();
+
+      renderTabel(data);
+      renderGrafikKategori(data);
+      renderGrafikTren(data);
+    } catch (err) {
+      // biarkan halaman kosong kalau gagal load
+    }
+  }
+
+  function renderTabel(data) {
+    const tbody = document.getElementById("tbody-riwayat");
+    const kosong = document.getElementById("riwayat-kosong");
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = "";
+      kosong.hidden = false;
+      return;
+    }
+
+    kosong.hidden = true;
+    const urut = [...data].sort((a, b) => (a.Tanggal < b.Tanggal ? 1 : -1));
+    tbody.innerHTML = urut.map((t) => `
+      <tr>
+        <td>${t.Tanggal}</td>
+        <td>${t.Nama}</td>
+        <td>${t.kartegori}</td>
+        <td class="rata-kanan">${formatRupiah(t.Harga)}</td>
+      </tr>
+    `).join("");
+  }
+
+  function renderGrafikKategori(data) {
+    const totalPerKategori = {};
+    (data || []).forEach((t) => {
+      const kat = t.kartegori || "Lainnya";
+      totalPerKategori[kat] = (totalPerKategori[kat] || 0) + Number(t.Harga || 0);
+    });
+
+    const label = Object.keys(totalPerKategori);
+    const nilai = Object.values(totalPerKategori);
+
+    if (chartKategori) chartKategori.destroy();
+    chartKategori = new Chart(document.getElementById("chart-kategori"), {
+      type: "doughnut",
+      data: {
+        labels: label,
+        datasets: [{
+          data: nilai,
+          backgroundColor: PALET_WARNA,
+          borderColor: "#efebe0",
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: "#24211d", boxWidth: 10, font: { size: 10 } },
+          },
+        },
+      },
+    });
+  }
+
+  function renderGrafikTren(data) {
+    const totalPerTanggal = {};
+    (data || []).forEach((t) => {
+      const tgl = (t.Tanggal || "").slice(0, 10);
+      totalPerTanggal[tgl] = (totalPerTanggal[tgl] || 0) + Number(t.Harga || 0);
+    });
+
+    const label = Object.keys(totalPerTanggal).sort();
+    const nilai = label.map((t) => totalPerTanggal[t]);
+
+    if (chartTren) chartTren.destroy();
+    chartTren = new Chart(document.getElementById("chart-tren"), {
+      type: "line",
+      data: {
+        labels: label,
+        datasets: [{
+          label: "Pengeluaran",
+          data: nilai,
+          borderColor: "#a93226",
+          backgroundColor: "rgba(169,50,38,0.15)",
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+        }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { font: { size: 9 }, color: "#8a8375" } },
+          y: { ticks: { font: { size: 9 }, color: "#8a8375" } },
+        },
+      },
+    });
+  }
+
+  async function refreshLaporan() {
+    await muatRingkasanStatistik();
+    await muatLaporan();
+  }
+
+  refreshLaporan();
+</script>
+</body>
+</html>

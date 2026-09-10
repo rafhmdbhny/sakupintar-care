@@ -17,7 +17,10 @@
       --green: #2f5d46;
       --red: #a93226;
       --yellow: #a8721f;
-      --table: #17140f;
+      --aksen: #0f766e;
+      --aksen-gelap: #115e59;
+      --aksen-lembut: #d9f0e9;
+      --table: #4b352d;
       --display: "Space Grotesk", sans-serif;
       --body: "Inter", sans-serif;
       --mono: "IBM Plex Mono", monospace;
@@ -30,54 +33,72 @@
       color: var(--ink);
       font-family: var(--body);
       background: var(--table);
-      background-image: radial-gradient(ellipse at 50% -10%, #2a251c 0%, var(--table) 60%);
+      background-image: linear-gradient(135deg, rgba(130, 99, 80, 0.18), transparent 38%), radial-gradient(ellipse at 50% -10%, #6b4c3d 0%, var(--table) 64%);
     }
-    .user-bar {
-      max-width: 760px;
-      margin: 1rem auto 0;
-      padding: 0.7rem 1rem;
+    .site-navbar {
+      width: min(1280px, calc(100% - 2rem));
+      margin: 1.25rem auto 0;
+      padding: 0.85rem 1.1rem;
       display: flex;
-      justify-content: space-between;
-      gap: 0.75rem;
       align-items: center;
-      background: rgba(239, 235, 224, 0.94);
-      border: 1px solid var(--carbon-light);
-      box-shadow: 0 16px 30px -18px rgba(0, 0, 0, 0.6);
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(239, 235, 224, 0.96);
+      border: 1px solid rgba(138, 131, 117, 0.45);
+      box-shadow: 0 18px 32px -24px rgba(0, 0, 0, 0.7);
+      border-radius: 14px;
       font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.04em;
       color: var(--ink);
     }
-    .user-bar strong { font-family: var(--display); letter-spacing: 0.04em; }
-    .logout-link {
-      color: var(--ink);
-      text-decoration: none;
-      border: 1px solid var(--ink);
-      padding: 0.4rem 0.7rem;
+    .navbar-brand {
+      font-family: var(--display);
+      font-size: 0.95rem;
       font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
     }
-    .logout-link:hover { background: var(--paper-dark); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .nav-links a, .nav-logout {
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--carbon);
+      padding: 0.45rem 0.75rem;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+    }
+    .nav-links a:hover, .nav-logout:hover { color: var(--ink); }
+    .nav-links a.active {
+      color: var(--ink);
+      background: var(--paper-dark);
+      border-color: rgba(138, 131, 117, 0.45);
+    }
+    .nav-logout {
+      color: var(--red);
+      border-bottom: 1px dashed currentColor;
+      padding-right: 0;
+      padding-left: 0;
+      white-space: nowrap;
+    }
     .table { display: flex; justify-content: center; padding: 3rem 1rem 5rem; }
     .receipt {
       position: relative;
       width: 100%;
-      max-width: 640px;
-      padding: 2.75rem 2rem 2rem;
-      background: var(--paper);
-      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .6);
+      max-width: 1280px;
+      padding: 3rem clamp(1.25rem, 4vw, 3.5rem) 2.5rem;
+      background: linear-gradient(180deg, rgba(239,235,224,1) 0%, rgba(245,241,232,1) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 22px;
+      box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.72);
     }
-    .receipt::before, .receipt::after {
-      content: "";
-      position: absolute;
-      right: 0;
-      left: 0;
-      height: 12px;
-      background: linear-gradient(-45deg, var(--paper) 6px, transparent 0), linear-gradient(45deg, var(--paper) 6px, transparent 0);
-      background-size: 12px 12px;
-      background-repeat: repeat-x;
-    }
-    .receipt::before { top: -12px; }
-    .receipt::after { bottom: -12px; transform: scaleY(-1); }
+    .receipt::before, .receipt::after { display: none; }
     .receipt-header { text-align: center; }
     .eyebrow, .tagline, .price, .change, .panel-link, .footer-note { font-family: var(--mono); }
     .eyebrow { margin: 0 0 .5rem; color: var(--carbon); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
@@ -86,15 +107,204 @@
     .lobby-link { display: inline-block; margin-top: 1rem; color: var(--ink); font: 700 .85rem var(--display); letter-spacing: .02em; text-decoration: none; border: 1.5px solid var(--ink); padding: .65rem 1.1rem; }
     .lobby-link:hover { background: var(--paper-dark); }
     .tear { height: 2px; margin: 1.75rem 0; background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px); }
-    .panel { margin-bottom: .5rem; }
+    .panel {
+      margin-bottom: .5rem;
+      padding: 1.25rem;
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(138, 131, 117, 0.22);
+      border-radius: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .crypto-overview {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(240px, 0.9fr);
+      gap: 1.1rem;
+      margin: 1.2rem 0 1.4rem;
+    }
+    .chart-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(233, 227, 213, 0.72));
+      border: 1px solid rgba(138, 131, 117, 0.28);
+      border-radius: 18px;
+      padding: 1rem 1rem 0.8rem;
+      min-height: 320px;
+      box-shadow: 0 18px 28px -22px rgba(0, 0, 0, 0.4);
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px dashed rgba(138, 131, 117, 0.35);
+    }
+    .chart-title {
+      margin: 0;
+      font: 700 1.3rem var(--display);
+    }
+    .chart-badge {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(47, 93, 70, 0.08);
+      color: var(--green);
+      border: 1px solid rgba(47, 93, 70, 0.25);
+    }
+    .chart-meta {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .chart-price {
+      font: 700 clamp(1.8rem, 3vw, 2.5rem) var(--display);
+      letter-spacing: -0.05em;
+      margin: 0;
+    }
+    .chart-change {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--green);
+      background: rgba(47, 93, 70, 0.08);
+      border: 1px solid rgba(47, 93, 70, 0.2);
+      padding: 0.35rem 0.5rem;
+      border-radius: 999px;
+    }
+    .chart-area {
+      width: 100%;
+      height: 220px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(19, 31, 26, 0.02), rgba(19, 31, 26, 0.06));
+    }
+    .chart-area svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .mini-stats {
+      display: grid;
+      gap: 0.8rem;
+    }
+    .stat-card {
+      padding: 1rem 1rem 0.9rem;
+      border-radius: 16px;
+      border: 1px solid rgba(138, 131, 117, 0.2);
+      background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(233,227,213,0.5));
+      box-shadow: 0 12px 20px -18px rgba(0, 0, 0, 0.4);
+    }
+    .coin-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0 0 1rem;
+    }
+    .coin-pill {
+      appearance: none;
+      border: 1px solid rgba(138, 131, 117, 0.28);
+      background: rgba(255,255,255,0.18);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.55rem 0.75rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .coin-pill:hover,
+    .coin-pill.active {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+    .movers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .mover-card {
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(138, 131, 117, 0.22);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .mover-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 118, 110, 0.4);
+    }
+    .mover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--carbon);
+    }
+    .mover-value {
+      font: 700 1.15rem var(--display);
+      margin: 0 0 0.2rem;
+    }
+    .mover-change {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.22rem 0.42rem;
+      border-radius: 999px;
+      background: rgba(47, 93, 70, 0.08);
+      color: var(--green);
+    }
+    .mover-change.down {
+      background: rgba(169, 50, 38, 0.08);
+      color: var(--red);
+    }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--carbon);
+      margin-bottom: 0.45rem;
+    }
+    .stat-value {
+      font: 700 1.45rem var(--display);
+      margin: 0;
+    }
+    .stat-value.small {
+      font-size: 1.05rem;
+    }
+    .stat-trend {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      margin-top: 0.45rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(47, 93, 70, 0.08);
+      color: var(--green);
+    }
     .panel-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .9rem; }
-    h2 { display: flex; align-items: center; gap: .5rem; margin: 0; font: 700 1.05rem var(--display); }
+    h2 { display: flex; align-items: center; gap: .5rem; margin: 0; font: 700 1.2rem var(--display); }
     .panel-link { color: var(--ink); font-size: .7rem; letter-spacing: .04em; text-decoration: none; border-bottom: 1px dashed var(--carbon-light); }
     .panel-link:hover { color: var(--yellow); }
-    .coin-row { display: grid; grid-template-columns: auto 1fr 60px auto; align-items: center; gap: .9rem; padding: .7rem 0; border-bottom: 1px dashed var(--carbon-light); }
+    .coin-row { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: .9rem; padding: .8rem .15rem; border-bottom: 1px dashed var(--carbon-light); }
     .coin-row:last-child { border-bottom: 0; }
-    .coin-icon { display: flex; width: 34px; height: 34px; align-items: center; justify-content: center; color: var(--ink); font: 600 .55rem var(--mono); background: var(--paper-dark); border: 1px solid var(--carbon-light); border-radius: 50%; text-transform: uppercase; }
-    .coin-name { font-size: .9rem; }
+    .coin-icon {
+      display: flex; width: 38px; height: 38px; align-items: center; justify-content: center; color: var(--ink); font: 600 .58rem var(--mono); background: var(--paper-dark); border: 1px solid var(--carbon-light); border-radius: 50%; text-transform: uppercase;
+    }
+    .coin-name { font-size: .9rem; font-weight: 600; }
     .sparkline { width: 60px; height: 30px; }
     .sparkline svg { width: 100%; height: 100%; }
     .price-block { display: flex; flex-direction: column; align-items: flex-end; gap: .3rem; }
@@ -114,10 +324,16 @@
       color: var(--ink);
       background: var(--paper);
       border: 1px solid var(--carbon-light);
-      padding: .65rem .75rem;
-      border-radius: 2px;
+      border-radius: 10px;
+      padding: .7rem .8rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .search-input:focus { outline: 2px solid var(--ink); outline-offset: 1px; }
+    .search-input:focus {
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+      border-color: var(--aksen);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
 
     .search-hint {
       font-family: var(--mono);
@@ -170,10 +386,10 @@
       background: none;
       border: none;
       color: var(--carbon);
-      font-size: .9rem;
+      font-size: 1rem;
       cursor: pointer;
       line-height: 1;
-      padding: .15rem .3rem;
+      padding: .2rem .35rem;
     }
     .btn-hapus-pantauan:hover { color: var(--red); }
 
@@ -187,9 +403,11 @@
 
     .hasil-analisa {
       margin-top: 1rem;
-      padding: 1rem 1rem 1rem 1.1rem;
-      background: var(--paper-dark);
-      border-left: 4px solid var(--ink);
+      padding: 1rem 1rem 1rem 1.2rem;
+      background: #fffdf7;
+      border: 1px solid rgba(138, 131, 117, 0.3);
+      border-left: 4px solid var(--aksen);
+      border-radius: 14px;
       font-size: .85rem;
       line-height: 1.55;
     }
@@ -207,9 +425,13 @@
     .hasil-analisa ul { margin: .2rem 0 0; padding-left: 1.1rem; }
     .hasil-analisa .memuat { font-style: italic; color: var(--carbon); }
 
+    @media (max-width: 760px) {
+      .site-navbar { flex-direction: column; align-items: stretch; text-align: center; }
+      .nav-links { justify-content: center; }
+    }
     @media (max-width: 480px) {
       .receipt { padding: 2.25rem 1.25rem 1.5rem; }
-      .coin-row { grid-template-columns: auto 1fr 44px auto; gap: .6rem; }
+      .coin-row { grid-template-columns: auto 1fr auto auto; gap: .6rem; }
       .sparkline { width: 44px; }
       .panel-link { font-size: .62rem; }
     }
@@ -217,10 +439,22 @@
   </style>
 </head>
 <body>
-  <div class="user-bar">
-    <span>Halo, <strong>{{ session.get('username', 'Pengguna') }}</strong></span>
-    <a class="logout-link" href="/logout">Logout</a>
+  <div class="fixed inset-0 z-[-2] overflow-hidden">
+    <div class="absolute -top-24 -left-20 h-80 w-80 rounded-full bg-green-500/20 blur-[120px]"></div>
+    <div class="absolute -bottom-24 -right-16 h-[26rem] w-[26rem] rounded-full bg-emerald-600/20 blur-[120px]"></div>
+    <div class="fixed inset-0 bg-[url('noise-pattern.png')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
   </div>
+
+  <header class="site-navbar">
+    <div class="navbar-brand">SAKU PINTAR &amp; CARE</div>
+    <nav class="nav-links" aria-label="Navigasi utama">
+      <a href="/">Keuangan</a>
+      <a href="/kesehatan">Kesehatan</a>
+      <a href="/#riwayat">Laporan</a>
+      <a href="/kripto" class="active">Kripto</a>
+    </nav>
+    <a href="/logout" class="nav-logout">Keluar</a>
+  </header>
 
   <div class="table">
     <main class="receipt">
@@ -232,6 +466,68 @@
       </header>
 
       <div class="tear"></div>
+
+      <section class="crypto-overview" aria-label="Ringkasan pasar kripto">
+        <div class="chart-card panel">
+          <div class="chart-header">
+            <h2 id="chart-title" class="chart-title">Market overview</h2>
+            <span id="chart-badge" class="chart-badge">BTC / USD</span>
+          </div>
+
+          <div class="chart-meta">
+            <div>
+              <p id="chart-price" class="chart-price">$0</p>
+            </div>
+            <span id="chart-change" class="chart-change">--</span>
+          </div>
+
+          <div class="chart-area" aria-label="Grafik harga kripto">
+            <svg id="chart-svg" viewBox="0 0 700 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="fillTrend" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#0f766e" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#0f766e" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <g>
+                <path id="chart-fill" d="M0,180 C60,160, 80,175, 120,150 S200,95, 260,120 S330,170, 390,130 S500,45, 560,80 S640,60, 700,40 L700,220 L0,220 Z" fill="url(#fillTrend)"/>
+                <path id="chart-line" d="M0,180 C60,160, 80,175, 120,150 S200,95, 260,120 S330,170, 390,130 S500,45, 560,80 S640,60, 700,40" fill="none" stroke="#115e59" stroke-width="4" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <aside class="mini-stats" aria-label="Statistik cepat kripto">
+          <div class="stat-card">
+            <div class="stat-label">Market cap</div>
+            <p id="stat-market-cap" class="stat-value small">$--</p>
+            <span id="stat-market-cap-change" class="stat-trend">--</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Volume 24h</div>
+            <p id="stat-volume" class="stat-value small">$--</p>
+            <span id="stat-volume-change" class="stat-trend">--</span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Dominance</div>
+            <p id="stat-dominance" class="stat-value small">--</p>
+            <span id="stat-dominance-tag" class="stat-trend">BTC</span>
+          </div>
+        </aside>
+      </section>
+
+      <div class="coin-filters" aria-label="Filter koin cepat">
+        <button type="button" class="coin-pill active" data-coin="bitcoin">BTC</button>
+        <button type="button" class="coin-pill" data-coin="ethereum">ETH</button>
+        <button type="button" class="coin-pill" data-coin="solana">SOL</button>
+        <button type="button" class="coin-pill" data-coin="ripple">XRP</button>
+        <button type="button" class="coin-pill" data-coin="dogecoin">DOGE</button>
+      </div>
+
+      <section class="panel" aria-label="Top movers">
+        <div class="panel-header"><h2><span aria-hidden="true">⚡</span> Top movers</h2></div>
+        <div id="top-movers" class="movers-grid"></div>
+      </section>
 
       <!-- ===================== PANEL DAFTAR PANTAUAN (BARU) ===================== -->
       <section class="panel" aria-label="Daftar pantauan">
@@ -277,12 +573,27 @@
     const ENDPOINT_ANALISA_KRIPTO = "/analisa-kripto";
     const MAKS_PANTAUAN = 10;
     const KEY_LOCALSTORAGE = "dompet_galak_watchlist_kripto";
+    const DEFAULT_CHART_COIN = "bitcoin";
 
     const inputCari = document.getElementById("input-cari-koin");
     const hasilCariBox = document.getElementById("hasil-cari-koin");
     const hintPantauan = document.getElementById("hint-pantauan");
     const daftarPantauanEl = document.getElementById("daftar-pantauan");
     const hasilAnalisaEl = document.getElementById("hasil-analisa-pantauan");
+    const chartTitle = document.getElementById("chart-title");
+    const chartBadge = document.getElementById("chart-badge");
+    const chartPrice = document.getElementById("chart-price");
+    const chartChange = document.getElementById("chart-change");
+    const chartLine = document.getElementById("chart-line");
+    const chartFill = document.getElementById("chart-fill");
+    const marketCapEl = document.getElementById("stat-market-cap");
+    const marketCapChangeEl = document.getElementById("stat-market-cap-change");
+    const volumeEl = document.getElementById("stat-volume");
+    const volumeChangeEl = document.getElementById("stat-volume-change");
+    const dominanceEl = document.getElementById("stat-dominance");
+    const dominanceTagEl = document.getElementById("stat-dominance-tag");
+    const topMoversEl = document.getElementById("top-movers");
+    const coinPills = document.querySelectorAll(".coin-pill");
 
     function muatWatchlist() {
       try {
@@ -437,6 +748,115 @@
       }
     }
 
+    function formatUsd(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return "$0";
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: value >= 1000 ? 0 : 2
+      }).format(Number(value));
+    }
+
+    function setChartPath(series) {
+      if (!series || series.length === 0) {
+        chartLine.setAttribute("d", "M0,180 C60,160, 80,175, 120,150 S200,95, 260,120 S330,170, 390,130 S500,45, 560,80 S640,60, 700,40");
+        chartFill.setAttribute("d", "M0,180 C60,160, 80,175, 120,150 S200,95, 260,120 S330,170, 390,130 S500,45, 560,80 S640,60, 700,40 L700,220 L0,220 Z");
+        return;
+      }
+
+      const values = series.map(point => point[1]);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+
+      const path = series.map((point, index) => {
+        const x = (index / Math.max(series.length - 1, 1)) * 700;
+        const y = 200 - ((point[1] - min) / range) * 150;
+        return `${index === 0 ? "M" : "L"}${x},${y}`;
+      }).join(" ");
+
+      const fillPath = `${path} L700,220 L0,220 Z`;
+      chartLine.setAttribute("d", path);
+      chartFill.setAttribute("d", fillPath);
+    }
+
+    async function renderTopMovers() {
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=gecko_desc&per_page=6&page=1&sparkline=false&price_change_percentage=24h");
+        const data = await res.json();
+
+        topMoversEl.innerHTML = (data || []).slice(0, 6).map((coin) => {
+          const change = Number(coin.price_change_percentage_24h ?? 0);
+          return `
+            <button type="button" class="mover-card" data-coin="${coin.id}">
+              <div class="mover-top">
+                <span>${coin.symbol.toUpperCase()}</span>
+                <span>${change >= 0 ? "▲" : "▼"}</span>
+              </div>
+              <p class="mover-value">${formatUsd(coin.current_price)}</p>
+              <span class="mover-change ${change < 0 ? "down" : ""}">${Math.abs(change).toFixed(2)}%</span>
+            </button>
+          `;
+        }).join("");
+
+        topMoversEl.querySelectorAll(".mover-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            const coinId = card.dataset.coin;
+            coinPills.forEach((pill) => {
+              pill.classList.toggle("active", pill.dataset.coin === coinId);
+            });
+            muatOverviewKripto(coinId);
+          });
+        });
+      } catch (err) {
+        topMoversEl.innerHTML = '<p class="kosong-pantauan">Top movers tidak dapat dimuat saat ini.</p>';
+      }
+    }
+
+    async function muatOverviewKripto(koinId = DEFAULT_CHART_COIN) {
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${encodeURIComponent(koinId)}&price_change_percentage=7d,24h`);
+        const data = await res.json();
+        const koin = data[0];
+
+        if (!koin) return;
+
+        const perubahan = Number(koin.price_change_percentage_7d_in_currency ?? 0);
+        const volume24h = Number(koin.total_volume ?? 0);
+        const marketCap = Number(koin.market_cap ?? 0);
+        const dominance = Number(koin.market_cap_percentage?.btc ?? 0);
+
+        chartTitle.textContent = koin.name || "Market overview";
+        chartBadge.textContent = `${(koin.symbol || "btc").toUpperCase()} / USD`;
+        chartPrice.textContent = formatUsd(koin.current_price || 0);
+        chartChange.textContent = `${perubahan >= 0 ? "▲" : "▼"} ${Math.abs(perubahan).toFixed(2)}% (7d)`;
+        chartChange.style.color = perubahan >= 0 ? "#2f5d46" : "#a93226";
+        chartChange.style.background = perubahan >= 0 ? "rgba(47, 93, 70, 0.08)" : "rgba(169, 50, 38, 0.08)";
+
+        marketCapEl.textContent = formatUsd(marketCap);
+        marketCapChangeEl.textContent = `${Number(koin.market_cap_change_percentage_24h ?? 0).toFixed(2)}%`;
+        marketCapChangeEl.style.color = Number(koin.market_cap_change_percentage_24h ?? 0) >= 0 ? "#2f5d46" : "#a93226";
+
+        volumeEl.textContent = formatUsd(volume24h);
+        volumeChangeEl.textContent = `${Number(koin.price_change_percentage_24h ?? 0).toFixed(2)}%`;
+        volumeChangeEl.style.color = Number(koin.price_change_percentage_24h ?? 0) >= 0 ? "#2f5d46" : "#a93226";
+
+        dominanceEl.textContent = `${dominance.toFixed(1)}%`;
+        dominanceTagEl.textContent = `${(koin.symbol || "btc").toUpperCase()}`;
+
+        const chartRes = await fetch(`https://api.coingecko.com/api/v3/coins/${encodeURIComponent(koinId)}/market_chart?vs_currency=usd&days=7&interval=daily`);
+        const chartData = await chartRes.json();
+
+        if (chartData.prices && chartData.prices.length) {
+          setChartPath(chartData.prices);
+        }
+      } catch (err) {
+        chartTitle.textContent = "Market overview";
+        chartPrice.textContent = "$--";
+        chartChange.textContent = "offline";
+      }
+    }
+
     // --- Auto analisa pas baris watchlist diklik ---
     async function mintaAnalisaOtomatis(koinId, namaKoin) {
       hasilAnalisaEl.hidden = false;
@@ -444,6 +864,8 @@
       hasilAnalisaEl.innerHTML = `<p class="memuat">Menganalisa ${namaKoin}...</p>`;
 
       try {
+        await muatOverviewKripto(koinId);
+
         const formData = new FormData();
         formData.append("koin", koinId);
 
@@ -469,8 +891,17 @@
       }
     }
 
+    coinPills.forEach((pill) => {
+      pill.addEventListener("click", () => {
+        coinPills.forEach((item) => item.classList.toggle("active", item === pill));
+        muatOverviewKripto(pill.dataset.coin);
+      });
+    });
+
     // Muat watchlist saat halaman dibuka
     renderWatchlist();
+    renderTopMovers();
+    muatOverviewKripto(DEFAULT_CHART_COIN);
   </script>
 </body>
 </html>

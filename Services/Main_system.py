@@ -3,12 +3,21 @@ import os
 from google import genai
 import pandas as pd
 import datetime as dt
+import math
 from Services.Ai_Service import generate_response
 from pydantic import BaseModel, Field
 import json
+import re
 from typing import Literal
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_]{3,30}$")
+
+
+def _user_file(prefix, username, suffix):
+    if not isinstance(username, str) or not USERNAME_PATTERN.fullmatch(username):
+        raise ValueError("Username hanya boleh berisi 3-30 karakter: huruf, angka, atau underscore.")
+    return os.path.join(PROJECT_ROOT, f"{prefix}_{username}{suffix}")
 
 class AnalisaMenyeluruh(BaseModel):
     kondisi_sekarang: str = Field(
@@ -72,7 +81,7 @@ finance_config = genai.types.GenerateContentConfig(
 )
 
 def Read_pengaturan(username):
-    path = os.path.join(PROJECT_ROOT, f"Pengaturan_{username}.json")
+    path = _user_file("Pengaturan", username, ".json")
     if os.path.exists(path):
         with open(path, "r") as f:
             return json.load(f)
@@ -83,7 +92,7 @@ def Read_pengaturan(username):
 
 
 def Save_pengaturan(username, budget_bulanan, umur, berat_badan, tinggi_badan):
-    path = os.path.join(PROJECT_ROOT, f"Pengaturan_{username}.json")
+    path = _user_file("Pengaturan", username, ".json")
     data = {
         "budget_bulanan": budget_bulanan,
         "umur": umur,
@@ -151,7 +160,7 @@ def Analisa_menyeluruh(username):
 
 #Read csv
 def Read_riwayat_transaksi(username):
-    csv_transaksi = os.path.join(PROJECT_ROOT, f"Data_transaksi_{username}.csv")
+    csv_transaksi = _user_file("Data_transaksi", username, ".csv")
     if os.path.exists(csv_transaksi):
         df = pd.read_csv(csv_transaksi)
         return df
@@ -167,7 +176,7 @@ def save_riwayat_transaksi(username, now, nama, jumlah, harga, kartegori):
     df = Read_riwayat_transaksi(username)
     new_data = pd.DataFrame({"Tanggal": [now], "Nama": [nama], "Jumlah": [jumlah], "Harga": [harga], "kartegori": [kartegori] })
     df = pd.concat([df, new_data], ignore_index=True)
-    df.to_csv(os.path.join(PROJECT_ROOT, f"Data_transaksi_{username}.csv"), index=False, encoding="utf-8")
+    df.to_csv(_user_file("Data_transaksi", username, ".csv"), index=False, encoding="utf-8")
 
     if kartegori == "Kesehatan":
         data_dana = Read_dana_darurat(username)
@@ -177,7 +186,7 @@ def save_riwayat_transaksi(username, now, nama, jumlah, harga, kartegori):
 
 
 def Read_dana_darurat(username):
-    path = os.path.join(PROJECT_ROOT, f"Dana_darurat_{username}.json")
+    path = _user_file("Dana_darurat", username, ".json")
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as file:
@@ -192,7 +201,7 @@ def Read_dana_darurat(username):
 
 
 def Save_dana_darurat(username, saldo):
-    path = os.path.join(PROJECT_ROOT, f"Dana_darurat_{username}.json")
+    path = _user_file("Dana_darurat", username, ".json")
     with open(path, "w", encoding="utf-8") as file:
         json.dump({"saldo": max(float(saldo), 0)}, file)
 
@@ -238,8 +247,12 @@ def Alokasikan_dana_darurat(username):
 
 
 def Setor_manual_dana_darurat(username, jumlah):
+    jumlah = float(jumlah)
+    if not math.isfinite(jumlah) or jumlah <= 0:
+        raise ValueError("Jumlah setor harus lebih besar dari 0.")
+
     data = Read_dana_darurat(username)
-    saldo_baru = data.get("saldo", 0) + float(jumlah)
+    saldo_baru = data.get("saldo", 0) + jumlah
     Save_dana_darurat(username, saldo_baru)
     return {"saldo": saldo_baru}
 
@@ -323,6 +336,11 @@ def Save_users(data):
 
 
 def Daftar_user(username, password):
+    if not isinstance(username, str) or not USERNAME_PATTERN.fullmatch(username):
+        return False, "Username hanya boleh berisi 3-30 karakter: huruf, angka, atau underscore."
+    if not isinstance(password, str) or not password:
+        return False, "Password wajib diisi."
+
     users = Read_users()
     if username in users:
         return False, "Username sudah dipakai."
@@ -335,6 +353,9 @@ def Daftar_user(username, password):
 
 
 def Cek_login(username, password):
+    if not isinstance(username, str) or not USERNAME_PATTERN.fullmatch(username):
+        return False
+
     users = Read_users()
     if username not in users:
         return False
