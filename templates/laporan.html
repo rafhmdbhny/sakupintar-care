@@ -490,7 +490,16 @@
     await muatLaporan();
   }
 
+  let laporanRefreshTimer = null;
+  function startLaporanAutoRefresh() {
+    if (laporanRefreshTimer) return;
+    laporanRefreshTimer = setInterval(() => {
+      refreshLaporan();
+    }, 5000);
+  }
+
   refreshLaporan();
+  startLaporanAutoRefresh();
 </script>
 </body>
 </html>

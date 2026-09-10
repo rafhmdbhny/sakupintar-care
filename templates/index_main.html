@@ -962,6 +962,17 @@
     }
   }
 
+  let refreshMainTimer = null;
+  function startMainAutoRefresh() {
+    if (refreshMainTimer) return;
+    refreshMainTimer = setInterval(() => {
+      muatStatistik();
+      muatRiwayat();
+    }, 5000);
+  }
+
+  startMainAutoRefresh();
+
   const ENDPOINT_PENGATURAN = "/pengaturan";
 
   const modalSetting = document.getElementById("modal-setting");
