@@ -6,7 +6,7 @@
 <title>Laporan — Saku Pintar & Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
   :root {
     --paper: #efebe0;
@@ -418,6 +418,21 @@
     `).join("");
   }
 
+  function showChartFallback(canvasId, message) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    const fallback = document.createElement("div");
+    fallback.className = "chart-empty";
+    fallback.textContent = message;
+    fallback.style.cssText = "display:flex;align-items:center;justify-content:center;height:100%;min-height:220px;color:#8a8375;font-size:0.8rem;font-weight:600;letter-spacing:0.04em;";
+    parent.innerHTML = "";
+    parent.appendChild(fallback);
+  }
+
   function renderGrafikKategori(data) {
     const totalPerKategori = {};
     (data || []).forEach((t) => {
@@ -427,6 +442,21 @@
 
     const label = Object.keys(totalPerKategori);
     const nilai = Object.values(totalPerKategori);
+
+    if (!label.length || !nilai.length) {
+      showChartFallback("chart-kategori", "Belum ada data kategori");
+      return;
+    }
+
+    if (typeof Chart === "undefined") {
+      showChartFallback("chart-kategori", "Chart.js gagal dimuat");
+      return;
+    }
+
+    const canvas = document.getElementById("chart-kategori");
+    if (canvas && canvas.parentElement) {
+      canvas.parentElement.innerHTML = "<canvas id=\"chart-kategori\"></canvas>";
+    }
 
     if (chartKategori) chartKategori.destroy();
     chartKategori = new Chart(document.getElementById("chart-kategori"), {
@@ -461,6 +491,21 @@
 
     const label = Object.keys(totalPerTanggal).sort();
     const nilai = label.map((t) => totalPerTanggal[t]);
+
+    if (!label.length || !nilai.length) {
+      showChartFallback("chart-tren", "Belum ada tren transaksi");
+      return;
+    }
+
+    if (typeof Chart === "undefined") {
+      showChartFallback("chart-tren", "Chart.js gagal dimuat");
+      return;
+    }
+
+    const canvas = document.getElementById("chart-tren");
+    if (canvas && canvas.parentElement) {
+      canvas.parentElement.innerHTML = "<canvas id=\"chart-tren\"></canvas>";
+    }
 
     if (chartTren) chartTren.destroy();
     chartTren = new Chart(document.getElementById("chart-tren"), {
