@@ -207,61 +207,35 @@ def Save_dana_darurat(username, saldo):
 
 
 def _hitung_alokasi_dana_darurat(username):
-    df = Read_riwayat_transaksi(username)
-    total_pengeluaran = 0.0
+    pengaturan = Read_pengaturan(username)
+    budget = float(pengaturan.get("budget_bulanan", 0) or 0)
+    total_pengeluaran, _, _ = Analisis_riwayat_transaksi(username, budget)
+    sisa_budget = budget - total_pengeluaran
 
-    if not df.empty and "Harga" in df.columns:
-        try:
-            total_pengeluaran = float(pd.to_numeric(df["Harga"], errors="coerce").fillna(0).sum())
-        except (OSError, ValueError, TypeError):
-            total_pengeluaran = 0.0
+    if sisa_budget <= 0:
+        return 0, 0
 
-    if total_pengeluaran > 0:
-        return total_pengeluaran * 0.1
-
-    csv_kripto = os.path.join(PROJECT_ROOT, "Data_kripto.csv")
-    keuntungan = 0.0
-
-    if os.path.exists(csv_kripto):
-        try:
-            df_kripto = pd.read_csv(csv_kripto)
-            if not df_kripto.empty:
-                kolom_numerik = df_kripto.select_dtypes(include="number").columns
-                if len(kolom_numerik) > 0:
-                    keuntungan = float(df_kripto[kolom_numerik[0]].sum()) * 0.01
-        except (OSError, ValueError, TypeError):
-            keuntungan = 0.0
-
-    return keuntungan * 0.1
+    alokasi = sisa_budget * 0.1
+    return sisa_budget, alokasi
 
 
 def Ambil_saldo_dana_darurat(username):
-    alokasi_tersedia = _hitung_alokasi_dana_darurat(username)
+    sisa_budget, alokasi_tersedia = _hitung_alokasi_dana_darurat(username)
     saldo = Read_dana_darurat(username)["saldo"]
-    df = Read_riwayat_transaksi(username)
-    total_pengeluaran = 0.0
-
-    if not df.empty and "Harga" in df.columns:
-        try:
-            total_pengeluaran = float(pd.to_numeric(df["Harga"], errors="coerce").fillna(0).sum())
-        except (OSError, ValueError, TypeError):
-            total_pengeluaran = 0.0
-
     return {
-        "keuntungan": total_pengeluaran or (alokasi_tersedia / 0.1 if alokasi_tersedia else 0),
-        "total_pengeluaran": total_pengeluaran,
+        "hemat": sisa_budget,
         "alokasi": alokasi_tersedia,
-        "terpakai": 0,
-        "sisa": saldo,
         "saldo": saldo,
+        "sisa": saldo,
     }
 
 
 def Alokasikan_dana_darurat(username):
-    alokasi = _hitung_alokasi_dana_darurat(username)
+    sisa_budget, alokasi = _hitung_alokasi_dana_darurat(username)
     saldo_baru = Read_dana_darurat(username)["saldo"] + alokasi
     Save_dana_darurat(username, saldo_baru)
     return {
+        "hemat": sisa_budget,
         "alokasi": alokasi,
         "saldo": saldo_baru,
         "sisa": saldo_baru,

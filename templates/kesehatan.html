@@ -464,7 +464,7 @@
             <h2>Dana Darurat Kesehatan</h2>
             <a class="btn btn-sekunder btn-crypto" href="{{ url_for('index') }}">Dashboard Keuangan</a>
           </div>
-          <p class="deskripsi">Dihitung otomatis dari sebagian keuntungan aset digital kamu, dikurangi pengeluaran kategori "Kesehatan" yang sudah tercatat.</p>
+          <p class="deskripsi">Dihitung otomatis dari sisa budget bulanan kamu (hasil hemat belanja), dikurangi pengeluaran kategori "Kesehatan" yang sudah tercatat.</p>
 
           <div class="box-stat" style="margin-bottom: 0.8rem;">
             <span class="label-mono">Saldo Saat Ini</span>
@@ -701,16 +701,13 @@
         hasilDana.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
       } else {
         const saldoSekarang = data.saldo ?? data.sisa;
-        const sumberPengeluaran = Number(data.total_pengeluaran ?? data.keuntungan ?? 0);
-        const labelSumber = sumberPengeluaran > 0 ? "Total pengeluaran bulan ini" : "Keuntungan bulan ini";
         document.getElementById("stat-dana").textContent = formatRupiah(saldoSekarang);
         document.getElementById("saldo-saat-ini").textContent = formatRupiah(saldoSekarang);
         hasilDana.innerHTML = `
-          <h3>Rincian Dana Darurat Kesehatan</h3>
-          <p>${labelSumber}: ${formatRupiah(data.total_pengeluaran ?? data.keuntungan ?? 0)}</p>
-          <p>Alokasi tersedia (10%): ${formatRupiah(data.alokasi)}</p>
-          <p>Saldo tersimpan: ${formatRupiah(saldoSekarang)}</p>
-          <p><strong>Sisa dana darurat: ${formatRupiah(data.sisa)}</strong></p>
+          <h3>Alokasi Dana Darurat Kesehatan</h3>
+          <p>Hemat dari budget bulan ini: ${formatRupiah(data.hemat || 0)}</p>
+          <p>Dialokasikan (10%): ${formatRupiah(data.alokasi || 0)}</p>
+          <p><strong>Saldo dana darurat sekarang: ${formatRupiah(saldoSekarang)}</strong></p>
         `;
       }
     } catch (err) {
