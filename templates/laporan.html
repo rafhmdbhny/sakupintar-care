@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Laporan — Saku Pintar & Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root {
@@ -19,8 +19,8 @@
     --kuning: #a8721f;
     --meja: #4b352d;
     --font-display: "Space Grotesk", sans-serif;
-    --font-body: "Inter", sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-mono: "Plus Jakarta Sans", sans-serif;
   }
 
   * { box-sizing: border-box; }
@@ -56,6 +56,7 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     white-space: nowrap;
+    color: var(--ink);
   }
 
   .nav-links {
@@ -69,9 +70,10 @@
   .nav-links a,
   .nav-logout {
     text-decoration: none;
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--carbon);
     padding: 0.45rem 0.75rem;
@@ -111,10 +113,10 @@
 
   .struk-kepala { text-align: center; position: relative; }
   .eyebrow {
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.7rem;
     letter-spacing: 0.12em;
-    color: var(--carbon);
+    color: rgba(36, 33, 29, 0.7);
     margin: 0 0 0.55rem;
     text-transform: uppercase;
   }
@@ -122,15 +124,16 @@
   h1 {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 800;
     font-size: clamp(2rem, 6vw, 2.8rem);
-    letter-spacing: 0.02em;
+    letter-spacing: -0.03em;
+    color: var(--ink);
   }
 
   .tagline {
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.85rem;
-    color: var(--carbon);
+    color: rgba(36, 33, 29, 0.7);
     margin: 0.5rem 0 0;
   }
 

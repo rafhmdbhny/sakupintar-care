@@ -6,7 +6,7 @@
   <title>Crypto Market Dashboard</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper: #efebe0;
@@ -22,8 +22,8 @@
       --aksen-lembut: #d9f0e9;
       --table: #4b352d;
       --display: "Space Grotesk", sans-serif;
-      --body: "Inter", sans-serif;
-      --mono: "IBM Plex Mono", monospace;
+      --body: "Plus Jakarta Sans", sans-serif;
+      --mono: "Plus Jakarta Sans", sans-serif;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -56,6 +56,7 @@
       font-weight: 700;
       letter-spacing: 0.04em;
       white-space: nowrap;
+      color: var(--ink);
     }
     .nav-links {
       display: flex;
@@ -66,8 +67,10 @@
     }
     .nav-links a, .nav-logout {
       text-decoration: none;
+      font-family: "Plus Jakarta Sans", sans-serif;
       font-size: 0.68rem;
-      letter-spacing: 0.05em;
+      font-weight: 600;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--carbon);
       padding: 0.45rem 0.75rem;
@@ -100,10 +103,10 @@
     }
     .receipt::before, .receipt::after { display: none; }
     .receipt-header { text-align: center; }
-    .eyebrow, .tagline, .price, .change, .panel-link, .footer-note { font-family: var(--mono); }
-    .eyebrow { margin: 0 0 .5rem; color: var(--carbon); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { margin: 0; font: 700 clamp(2rem, 6vw, 2.6rem) var(--display); letter-spacing: .02em; }
-    .tagline { margin: .4rem 0 0; color: var(--carbon); font-size: .85rem; }
+    .eyebrow, .tagline, .price, .change, .panel-link, .footer-note { font-family: "Plus Jakarta Sans", sans-serif; }
+    .eyebrow { margin: 0 0 .5rem; color: rgba(36, 33, 29, 0.7); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; font: 800 clamp(2rem, 6vw, 2.6rem) var(--display); letter-spacing: -.03em; color: var(--ink); }
+    .tagline { margin: .4rem 0 0; color: rgba(36, 33, 29, 0.7); font-size: .85rem; }
     .lobby-link { display: inline-block; margin-top: 1rem; color: var(--ink); font: 700 .85rem var(--display); letter-spacing: .02em; text-decoration: none; border: 1.5px solid var(--ink); padding: .65rem 1.1rem; }
     .lobby-link:hover { background: var(--paper-dark); }
     .tear { height: 2px; margin: 1.75rem 0; background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px); }

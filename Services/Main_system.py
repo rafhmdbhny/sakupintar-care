@@ -207,8 +207,20 @@ def Save_dana_darurat(username, saldo):
 
 
 def _hitung_alokasi_dana_darurat(username):
+    df = Read_riwayat_transaksi(username)
+    total_pengeluaran = 0.0
+
+    if not df.empty and "Harga" in df.columns:
+        try:
+            total_pengeluaran = float(pd.to_numeric(df["Harga"], errors="coerce").fillna(0).sum())
+        except (OSError, ValueError, TypeError):
+            total_pengeluaran = 0.0
+
+    if total_pengeluaran > 0:
+        return total_pengeluaran * 0.1
+
     csv_kripto = os.path.join(PROJECT_ROOT, "Data_kripto.csv")
-    keuntungan = 0
+    keuntungan = 0.0
 
     if os.path.exists(csv_kripto):
         try:
@@ -218,7 +230,7 @@ def _hitung_alokasi_dana_darurat(username):
                 if len(kolom_numerik) > 0:
                     keuntungan = float(df_kripto[kolom_numerik[0]].sum()) * 0.01
         except (OSError, ValueError, TypeError):
-            keuntungan = 0
+            keuntungan = 0.0
 
     return keuntungan * 0.1
 
@@ -226,8 +238,18 @@ def _hitung_alokasi_dana_darurat(username):
 def Ambil_saldo_dana_darurat(username):
     alokasi_tersedia = _hitung_alokasi_dana_darurat(username)
     saldo = Read_dana_darurat(username)["saldo"]
+    df = Read_riwayat_transaksi(username)
+    total_pengeluaran = 0.0
+
+    if not df.empty and "Harga" in df.columns:
+        try:
+            total_pengeluaran = float(pd.to_numeric(df["Harga"], errors="coerce").fillna(0).sum())
+        except (OSError, ValueError, TypeError):
+            total_pengeluaran = 0.0
+
     return {
-        "keuntungan": alokasi_tersedia / 0.1,
+        "keuntungan": total_pengeluaran or (alokasi_tersedia / 0.1 if alokasi_tersedia else 0),
+        "total_pengeluaran": total_pengeluaran,
         "alokasi": alokasi_tersedia,
         "terpakai": 0,
         "sisa": saldo,

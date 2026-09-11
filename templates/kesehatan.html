@@ -5,8 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SAKU PINTAR&CARE — Kesehatan</title>
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        boxShadow: {
+          soft: '0 20px 45px -28px rgba(15, 23, 42, 0.45)'
+        }
+      }
+    }
+  };
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -19,10 +31,9 @@
     --hijau: #2f5d46;
     --kuning: #a8721f;
     --meja: #4b352d;
-
     --font-display: "Space Grotesk", sans-serif;
-    --font-body: "Inter", sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-mono: "Plus Jakarta Sans", sans-serif;
     --radius: 2px;
   }
 
@@ -31,35 +42,38 @@
 
   body {
     margin: 0;
+    min-height: 100vh;
     font-family: var(--font-body);
     color: var(--ink);
     background: var(--meja);
     background-image: linear-gradient(135deg, rgba(130, 99, 80, 0.18), transparent 38%), radial-gradient(ellipse at 50% -10%, #6b4c3d 0%, var(--meja) 64%);
-    min-height: 100vh;
   }
 
   .site-navbar {
-    width: min(1180px, calc(100% - 2rem));
+    width: min(1280px, calc(100% - 2rem));
     margin: 1.25rem auto 0;
     padding: 0.85rem 1.1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    background: rgba(239, 235, 224, 0.94);
-    border: 1px solid rgba(138, 131, 117, 0.4);
+    background: rgba(239, 235, 224, 0.96);
+    border: 1px solid rgba(138, 131, 117, 0.45);
     box-shadow: 0 18px 32px -24px rgba(0, 0, 0, 0.7);
     border-radius: 14px;
-    font-family: var(--font-mono);
-    color: var(--ink);
+    position: relative;
+    z-index: 10;
   }
+
   .navbar-brand {
     font-family: var(--font-display);
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     white-space: nowrap;
+    color: var(--ink);
   }
+
   .nav-links {
     display: flex;
     align-items: center;
@@ -67,21 +81,30 @@
     gap: 0.45rem;
     flex-wrap: wrap;
   }
-  .nav-links a, .nav-logout {
+
+  .nav-links a,
+  .nav-logout {
     text-decoration: none;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--carbon);
     padding: 0.45rem 0.75rem;
     border: 1px solid transparent;
+    transition: all 0.18s ease;
   }
-  .nav-links a:hover, .nav-logout:hover { color: var(--ink); }
+
+  .nav-links a:hover,
+  .nav-logout:hover { color: var(--ink); }
+
   .nav-links a.active {
     color: var(--ink);
     background: var(--paper-dark);
     border-color: rgba(138, 131, 117, 0.45);
   }
+
   .nav-logout {
     color: var(--merah);
     border-bottom: 1px dashed currentColor;
@@ -95,24 +118,15 @@
   .struk {
     position: relative;
     width: 100%;
-    max-width: 1180px;
-    background: var(--paper);
-    padding: 2.75rem 2rem 2rem;
-    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+    max-width: 1280px;
+    background: linear-gradient(180deg, rgba(239,235,224,1) 0%, rgba(245,241,232,1) 100%);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 22px;
+    padding: 3rem clamp(1.25rem, 4vw, 3.5rem) 2.5rem;
+    box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.72);
   }
 
-  .struk::before, .struk::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; height: 12px;
-    background:
-      linear-gradient(-45deg, var(--paper) 6px, transparent 0),
-      linear-gradient(45deg, var(--paper) 6px, transparent 0);
-    background-size: 12px 12px;
-    background-repeat: repeat-x;
-  }
-  .struk::before { top: -12px; }
-  .struk::after  { bottom: -12px; transform: scaleY(-1); }
+  .struk::before, .struk::after { display: none; }
 
   .struk-kepala { text-align: center; position: relative; }
 
@@ -127,36 +141,38 @@
     color: var(--ink);
     border-radius: 50%;
     font-size: 1rem;
-    text-decoration: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.2s ease, background 0.15s ease;
+    text-decoration: none;
   }
-  .btn-gear:hover { background: var(--ink); color: var(--paper); }
+  .btn-gear:hover { background: var(--ink); color: var(--paper); transform: rotate(45deg); }
 
   .eyebrow {
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.7rem;
     letter-spacing: 0.12em;
-    color: var(--carbon);
-    margin: 0 0 0.5rem;
+    color: rgba(36, 33, 29, 0.7);
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
   }
 
   .struk-kepala h1 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2rem, 6vw, 2.6rem);
-    letter-spacing: 0.02em;
     margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    letter-spacing: -0.03em;
+    color: var(--ink);
   }
 
   .tagline {
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.85rem;
-    color: var(--carbon);
-    margin: 0.4rem 0 0;
+    color: rgba(36, 33, 29, 0.7);
+    margin: 0.5rem 0 0;
   }
 
   .sobekan {
@@ -165,31 +181,44 @@
     background-image: repeating-linear-gradient(to right, var(--carbon-light) 0 8px, transparent 8px 16px);
   }
 
-  .statistik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .statistik {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
 
   .box-stat {
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    padding: 0.9rem 0.75rem;
-    background: var(--paper-dark);
-    border: 1px solid var(--carbon-light);
+    padding: 1rem 1rem 0.95rem;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(138, 131, 117, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 12px 20px -18px rgba(0,0,0,0.4);
   }
 
   .label-mono {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.04em;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
     color: var(--carbon);
     text-transform: uppercase;
   }
 
-  .angka { font-family: var(--font-mono); font-weight: 600; font-size: 1.15rem; }
+  .angka {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2vw, 1.7rem);
+    font-weight: 700;
+  }
 
   .stempel {
     position: absolute;
-    top: -10px; right: -10px;
+    top: -10px;
+    right: -10px;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.6rem;
@@ -200,13 +229,76 @@
     transform: rotate(12deg);
     background: var(--paper);
     white-space: nowrap;
+    z-index: 2;
   }
   .stempel-merah  { color: var(--merah); }
   .stempel-kuning { color: var(--kuning); }
   .stempel-hijau  { color: var(--hijau); }
 
-  .panel h2 { font-family: var(--font-display); font-size: 1.05rem; margin: 0 0 0.35rem; }
-  .deskripsi { font-size: 0.85rem; color: var(--carbon); margin: 0 0 0.9rem; }
+  .health-card {
+    position: relative;
+    border-radius: 18px;
+    border: 1px solid rgba(138, 131, 117, 0.28);
+    background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(233, 227, 213, 0.72));
+    box-shadow: 0 18px 28px -22px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    padding: 1.25rem;
+  }
+  .health-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+  }
+  .health-card-water { border-color: rgba(14, 165, 233, 0.3); }
+  .health-card-bmi { border-color: rgba(16, 185, 129, 0.3); }
+
+  .health-control-btn {
+    border: 1px solid rgba(148, 163, 184, 0.75);
+    background: rgba(248, 250, 252, 0.9);
+    color: var(--ink);
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .health-control-btn:hover { background: rgba(226, 232, 240, 0.9); }
+  .health-control-btn:active { transform: translateY(1px); }
+
+  .panel {
+    margin-top: 1.75rem;
+    padding: 1.25rem;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(138, 131, 117, 0.22);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  .panel h2 {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .deskripsi {
+    font-size: 0.85rem;
+    color: var(--carbon);
+    margin: 0 0 0.9rem;
+  }
+
+  .panel-judul-aksi {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+
+  .analisa-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+  .analisa-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem; }
+  .btn-crypto { display: inline-block; text-decoration: none; }
+  .baris-input { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .baris-input > * { flex: 1; min-width: 120px; }
 
   textarea, input[type="text"], input[type="number"] {
     width: 100%;
@@ -226,14 +318,15 @@
 
   textarea { resize: vertical; margin-bottom: 0.7rem; }
 
-  .baris-input { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
-  .baris-input > * { flex: 1; min-width: 120px; }
-
   .btn {
     font-family: var(--font-display);
-    font-weight: 700; font-size: 0.85rem; letter-spacing: 0.02em;
-    border: none; border-radius: var(--radius);
-    padding: 0.65rem 1.1rem; cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.65rem 1.1rem;
+    cursor: pointer;
     transition: transform 0.08s ease;
   }
   .btn:active { transform: translateY(1px); }
@@ -245,21 +338,6 @@
   .btn-sekunder { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
   .btn-sekunder:hover { background: var(--paper-dark); }
 
-  .btn-crypto { display: inline-block; text-decoration: none; }
-  .analisa-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem; }
-  .analisa-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
-  .panel-judul-aksi {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.4rem;
-  }
-  .panel-judul-aksi h2 { margin: 0; }
-  .analisa-pasar { text-align: left; }
-  .analisa-pasar h2 { margin-bottom: 0.8rem; }
-
   .hasil-ai {
     margin-top: 1rem;
     padding: 1rem 1rem 1rem 1.2rem;
@@ -267,31 +345,22 @@
     border-left: 4px solid var(--ink);
     font-size: 0.88rem;
     line-height: 1.55;
+    border-radius: 12px;
   }
   .hasil-ai h3 { font-family: var(--font-display); font-size: 0.85rem; margin: 0 0 0.4rem; }
   .hasil-ai p { margin: 0 0 0.4rem; }
   .hasil-ai p:last-child { margin-bottom: 0; }
   .hasil-ai.error { border-left-color: var(--merah); color: var(--merah); }
 
-  .ledger { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
-  .ledger th {
-    text-align: left; font-size: 0.65rem; letter-spacing: 0.04em;
-    color: var(--carbon); text-transform: uppercase;
-    border-bottom: 1px solid var(--ink); padding-bottom: 0.4rem;
-  }
-  .ledger td { padding: 0.45rem 0.3rem; border-bottom: 1px dashed var(--carbon-light); }
-  .rata-kanan { text-align: right; }
-  .kosong { font-size: 0.85rem; color: var(--carbon); font-style: italic; }
-
   .struk-kaki { text-align: center; margin-top: 2rem; }
   .struk-kaki p { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--carbon); }
 
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     .statistik { grid-template-columns: 1fr; }
     .struk { padding: 2.25rem 1.25rem 1.5rem; }
     .analisa-layout { grid-template-columns: 1fr; gap: 1rem; }
-    .analisa-pasar { text-align: left; }
   }
+
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .btn { transition: none; }
@@ -321,60 +390,68 @@
 
     <header class="struk-kepala">
       <a class="btn-gear" href="{{ url_for('index') }}" aria-label="Kembali ke dashboard keuangan" title="Dashboard Keuangan">←</a>
-      <p class="eyebrow">TOKO KESEHATAN "SAKU PINTAR&CARE"</p>
-      <h1>SAKU PINTAR&&nbsp;CARE</h1>
+      <p class="eyebrow">TOKO KESEHATAN "SAKU PINTAR & CARE"</p>
+      <h1>SAKU PINTAR &amp; CARE</h1>
       <p class="tagline">asisten yang julid demi badan kamu tetap oke</p>
     </header>
 
     <div class="sobekan"></div>
 
     <!-- ================= 3 BOX STATISTIK ================= -->
-    <section class="statistik" aria-label="Ringkasan kesehatan">
-      <div class="box-stat">
+    <section class="statistik summary-grid" aria-label="Ringkasan kesehatan">
+      <div class="box-stat summary-card">
         <span class="label-mono">BMI KAMU</span>
         <span class="angka" id="stat-bmi">—</span>
       </div>
-      <div class="box-stat" id="box-kategori">
+      <div class="box-stat summary-card" id="box-kategori">
         <span class="label-mono">KATEGORI</span>
         <span class="angka" id="stat-kategori">Belum diisi</span>
         <span class="stempel stempel-hijau" id="stempel-bmi" hidden>NORMAL</span>
       </div>
-      <div class="box-stat">
+      <div class="box-stat summary-card">
         <span class="label-mono">DANA DARURAT KESEHATAN</span>
         <span class="angka" id="stat-dana">Rp0</span>
       </div>
     </section>
 
-    <!-- ================= CEK KESEHATAN ================= -->
-    <section class="panel" aria-label="Cek kesehatan">
-      <h2>Cek Kesehatan</h2>
-      <p class="deskripsi">Isi data badan kamu, biar AI bisa kasih saran — bukan cuma dinyinyirin soal duit doang.</p>
-
-      <form id="form-kesehatan">
-        <div class="baris-input">
-          <input type="number" name="umur" id="input-umur-k" placeholder="Umur (tahun)" min="0">
-          <input type="number" name="berat" id="input-berat-k" placeholder="Berat badan (kg)" step="0.1" min="0" required>
-          <input type="number" name="tinggi" id="input-tinggi-k" placeholder="Tinggi badan (cm)" step="0.1" min="0" required>
+    <section class="mt-6">
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="health-card health-card-water p-5">
+          <div class="relative z-10 flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-sky-700">Air Minum Hari Ini</p>
+              <h3 id="air-count" class="mt-3 text-3xl font-black text-slate-900">0</h3>
+              <p id="air-status" class="mt-1 text-sm text-slate-600">0 dari 8 gelas</p>
+            </div>
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5c-2.7 3.5-6.5 7.4-6.5 11.2A6.5 6.5 0 0 0 12 20.2a6.5 6.5 0 0 0 6.5-6.5C18.5 9.9 14.7 6 12 2.5Zm0 3.2c1.4 2 3.5 4.5 3.5 6.5A3.5 3.5 0 0 1 12 15.7a3.5 3.5 0 0 1-3.5-3.5c0-2 2.1-4.5 3.5-6.5Z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="relative z-10 mt-5 flex items-center justify-center gap-3">
+            <button type="button" data-action="decrease" aria-label="Kurangi air minum" class="health-control-btn flex h-10 w-10 items-center justify-center rounded-full text-xl font-bold">-</button>
+            <span id="air-display" class="min-w-[3rem] text-center text-xl font-bold text-slate-900">0</span>
+            <button type="button" data-action="increase" aria-label="Tambah air minum" class="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-xl font-bold text-white transition hover:bg-sky-700">+</button>
+          </div>
         </div>
-        <textarea name="keluhan" id="input-keluhan" rows="2" placeholder="Ada keluhan? (mis. gampang capek, susah tidur, dll) — boleh dikosongkan"></textarea>
-        <button type="submit" class="btn btn-utama">Analisa Kesehatan</button>
-      </form>
 
-      <div id="hasil-kesehatan" class="hasil-ai" hidden></div>
-    </section>
-
-    <div class="sobekan"></div>
-
-    <!-- ================= RIWAYAT CEK KESEHATAN ================= -->
-    <section class="panel" aria-label="Riwayat cek kesehatan">
-      <h2>Riwayat Cek Kesehatan</h2>
-      <table class="ledger" id="tabel-riwayat-kesehatan">
-        <thead>
-          <tr><th>Tanggal</th><th>BB / TB</th><th>BMI</th><th class="rata-kanan">Kategori</th></tr>
-        </thead>
-        <tbody id="tbody-riwayat-kesehatan"></tbody>
-      </table>
-      <p class="kosong" id="riwayat-kesehatan-kosong" hidden>Belum ada catatan kesehatan. Yuk cek kondisi kamu dulu.</p>
+        <div class="health-card health-card-bmi p-5">
+          <div class="relative z-10 flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-emerald-700">BMI Kamu</p>
+              <h3 id="bmi-card-value" class="mt-3 text-3xl font-black text-slate-900">--</h3>
+              <p id="bmi-card-label" class="mt-1 text-sm text-slate-600">Belum ada data</p>
+            </div>
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 3a1 1 0 0 1 1 1v2.1l1.7-1.7a1 1 0 1 1 1.4 1.4L14.4 7.5H16a1 1 0 0 1 0 2h-1.4l1.7 1.7a1 1 0 0 1-1.4 1.4L13 11.6V14a1 1 0 1 1-2 0v-2.4l-1.7 1.7a1 1 0 0 1-1.4-1.4l1.7-1.7H8a1 1 0 1 1 0-2h1.4L7.7 7.5a1 1 0 1 1 1.4-1.4L11 7.8V5a1 1 0 0 1 1-1Zm-7 12.5a1 1 0 0 1 1 1V18a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-1.5a1 1 0 1 1 2 0V18a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-1.5a1 1 0 0 1 1-1Z"/>
+              </svg>
+            </div>
+          </div>
+          <button id="open-bmi-modal" type="button" class="relative z-10 mt-5 inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">Input Data Tubuh</button>
+        </div>
+      </div>
     </section>
 
     <div class="sobekan"></div>
@@ -414,150 +491,201 @@
   </main>
 </div>
 
+<div id="bmi-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+  <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-slate-900">Input Data Tubuh</h3>
+      <button id="close-bmi-modal" type="button" class="text-2xl leading-none text-slate-500 hover:text-slate-700">&times;</button>
+    </div>
+
+    <form id="form-bmi-body" class="space-y-4">
+      <div>
+        <label for="bmi-berat" class="mb-1 block text-sm font-medium text-slate-700">Berat badan (kg)</label>
+        <input id="bmi-berat" name="berat" type="number" min="0" step="0.1" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100" placeholder="Contoh: 58.5">
+      </div>
+
+      <div>
+        <label for="bmi-tinggi" class="mb-1 block text-sm font-medium text-slate-700">Tinggi badan (cm)</label>
+        <input id="bmi-tinggi" name="tinggi" type="number" min="0" step="0.1" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100" placeholder="Contoh: 165">
+      </div>
+
+      <button type="submit" class="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-700">Hitung BMI</button>
+    </form>
+  </div>
+</div>
+
 <script>
-  const ENDPOINT_KESEHATAN    = "/api/kesehatan";
   const ENDPOINT_DANA_DARURAT = "/api/dana-darurat";
   const ENDPOINT_ALOKASI_DANA = "/api/dana-darurat/alokasikan";
-  const KEY_RIWAYAT           = "riwayat_kesehatan";
+  const KEY_AIR_MINUM = "saku_air_minum_today";
+  const KEY_BMI_DATA = "saku_bmi_data";
+
+  function getAirMinumCount() {
+    const value = Number(localStorage.getItem(KEY_AIR_MINUM) || 0);
+    return Number.isFinite(value) ? Math.max(0, value) : 0;
+  }
+
+  function renderAirMinum() {
+    const count = getAirMinumCount();
+    const display = document.getElementById("air-display");
+    const countEl = document.getElementById("air-count");
+    const statusEl = document.getElementById("air-status");
+
+    if (display) display.textContent = count;
+    if (countEl) countEl.textContent = count;
+    if (statusEl) {
+      statusEl.textContent = count >= 8 ? "Target hari ini terpenuhi" : `${count} dari 8 gelas`;
+    }
+  }
+
+  function updateAirMinum(delta) {
+    const next = Math.max(0, getAirMinumCount() + delta);
+    localStorage.setItem(KEY_AIR_MINUM, String(next));
+    renderAirMinum();
+  }
+
+  function getBmiStatus(bmi) {
+    if (bmi < 18.5) return { label: "Kurus" };
+    if (bmi < 25) return { label: "Normal" };
+    if (bmi < 30) return { label: "Gemuk" };
+    return { label: "Obesitas" };
+  }
+
+  function renderBmiCard(data) {
+    const valueEl = document.getElementById("bmi-card-value");
+    const labelEl = document.getElementById("bmi-card-label");
+    const statBmi = document.getElementById("stat-bmi");
+    const statKategori = document.getElementById("stat-kategori");
+    const stempelBmi = document.getElementById("stempel-bmi");
+
+    if (!data) {
+      if (valueEl) valueEl.textContent = "--";
+      if (labelEl) labelEl.textContent = "Belum ada data";
+      if (statBmi) statBmi.textContent = "—";
+      if (statKategori) statKategori.textContent = "Belum diisi";
+      if (stempelBmi) {
+        stempelBmi.hidden = true;
+        stempelBmi.textContent = "NORMAL";
+      }
+      return;
+    }
+
+    const bmi = data.berat / ((data.tinggi / 100) ** 2);
+    const status = getBmiStatus(bmi);
+
+    if (valueEl) valueEl.textContent = bmi.toFixed(1);
+    if (labelEl) labelEl.textContent = `${status.label} • ${bmi.toFixed(1)}`;
+    if (statBmi) statBmi.textContent = bmi.toFixed(1);
+    if (statKategori) statKategori.textContent = status.label;
+    if (stempelBmi) {
+      stempelBmi.hidden = false;
+      stempelBmi.textContent = status.label.toUpperCase();
+      stempelBmi.classList.remove("stempel-merah", "stempel-kuning", "stempel-hijau");
+      if (status.label === "Normal") stempelBmi.classList.add("stempel-hijau");
+      else if (status.label === "Obesitas") stempelBmi.classList.add("stempel-merah");
+      else stempelBmi.classList.add("stempel-kuning");
+    }
+  }
+
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const delta = button.dataset.action === "increase" ? 1 : -1;
+      updateAirMinum(delta);
+    });
+  });
+
+  const bmiModal = document.getElementById("bmi-modal");
+  const openBmiModal = document.getElementById("open-bmi-modal");
+  const closeBmiModal = document.getElementById("close-bmi-modal");
+  const bmiForm = document.getElementById("form-bmi-body");
+
+  function openModal() {
+    if (!bmiModal) return;
+    bmiModal.classList.remove("hidden");
+    bmiModal.classList.add("flex");
+  }
+
+  function closeModal() {
+    if (!bmiModal) return;
+    bmiModal.classList.add("hidden");
+    bmiModal.classList.remove("flex");
+  }
+
+  if (openBmiModal) openBmiModal.addEventListener("click", openModal);
+  if (closeBmiModal) closeBmiModal.addEventListener("click", closeModal);
+  if (bmiModal) {
+    bmiModal.addEventListener("click", (event) => {
+      if (event.target === bmiModal) closeModal();
+    });
+  }
+
+  if (bmiForm) {
+    bmiForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const berat = Number(document.getElementById("bmi-berat").value);
+      const tinggi = Number(document.getElementById("bmi-tinggi").value);
+
+      if (!berat || !tinggi || berat <= 0 || tinggi <= 0) {
+        return;
+      }
+
+      const payload = { berat, tinggi };
+      localStorage.setItem(KEY_BMI_DATA, JSON.stringify(payload));
+      renderBmiCard(payload);
+      closeModal();
+      bmiForm.reset();
+    });
+  }
+
+  async function loadBmiFromServer() {
+    try {
+      const res = await fetch("/pengaturan");
+      if (!res.ok) return false;
+      const data = await res.json();
+      const berat = Number(data.berat_badan);
+      const tinggi = Number(data.tinggi_badan);
+      if (Number.isFinite(berat) && berat > 0 && Number.isFinite(tinggi) && tinggi > 0) {
+        const payload = { berat, tinggi };
+        localStorage.setItem(KEY_BMI_DATA, JSON.stringify(payload));
+        renderBmiCard(payload);
+        return true;
+      }
+    } catch (error) {
+      console.warn("BMI server sync failed", error);
+    }
+    return false;
+  }
+
+  async function loadBmiFromStorage() {
+    try {
+      const raw = localStorage.getItem(KEY_BMI_DATA);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && Number(data.berat) > 0 && Number(data.tinggi) > 0) {
+          renderBmiCard(data);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn("BMI storage invalid", error);
+    }
+
+    const synced = await loadBmiFromServer();
+    if (!synced) {
+      renderBmiCard(null);
+    }
+  }
 
   function formatRupiah(angka) {
     return "Rp" + Number(angka || 0).toLocaleString("id-ID");
   }
-
-  function hitungBMI(berat, tinggi) {
-    const tinggiM = tinggi / 100;
-    return berat / (tinggiM * tinggiM);
-  }
-
-  function kategoriBMI(bmi) {
-    if (bmi < 18.5) return { label: "Kurus", kelas: "stempel-kuning" };
-    if (bmi < 25)   return { label: "Normal", kelas: "stempel-hijau" };
-    if (bmi < 30)   return { label: "Gemuk", kelas: "stempel-kuning" };
-    return { label: "Obesitas", kelas: "stempel-merah" };
-  }
-
-  function muatRiwayatLocal() {
-    try {
-      return JSON.parse(localStorage.getItem(KEY_RIWAYAT) || "[]");
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function simpanRiwayatLocal(entry) {
-    const data = muatRiwayatLocal();
-    data.unshift(entry);
-    localStorage.setItem(KEY_RIWAYAT, JSON.stringify(data.slice(0, 20)));
-  }
-
-  function renderRiwayatKesehatan() {
-    const data = muatRiwayatLocal();
-    const tbody = document.getElementById("tbody-riwayat-kesehatan");
-    const kosong = document.getElementById("riwayat-kesehatan-kosong");
-
-    if (!data.length) {
-      tbody.innerHTML = "";
-      kosong.hidden = false;
-      return;
-    }
-    kosong.hidden = true;
-    tbody.innerHTML = data.map(d => `
-      <tr>
-        <td>${d.tanggal}</td>
-        <td>${d.berat}kg / ${d.tinggi}cm</td>
-        <td>${Number(d.bmi).toFixed(1)}</td>
-        <td class="rata-kanan">${d.kategori}</td>
-      </tr>
-    `).join("");
-  }
-
-  function tampilkanStatUtama(bmi, kategori) {
-    document.getElementById("stat-bmi").textContent = bmi.toFixed(1);
-    document.getElementById("stat-kategori").textContent = kategori.label;
-    const stempel = document.getElementById("stempel-bmi");
-    stempel.hidden = false;
-    stempel.textContent = kategori.label.toUpperCase();
-    stempel.classList.remove("stempel-merah", "stempel-kuning", "stempel-hijau");
-    stempel.classList.add(kategori.kelas);
-  }
-
-  const formKesehatan = document.getElementById("form-kesehatan");
-  const hasilKesehatan = document.getElementById("hasil-kesehatan");
-
-  formKesehatan.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formKesehatan);
-    const berat = parseFloat(formData.get("berat"));
-    const tinggi = parseFloat(formData.get("tinggi"));
-    const umur = formData.get("umur");
-    const keluhan = formData.get("keluhan");
-
-    if (!berat || !tinggi) return;
-
-    const bmi = hitungBMI(berat, tinggi);
-    const kategori = kategoriBMI(bmi);
-    tampilkanStatUtama(bmi, kategori);
-
-    const btn = formKesehatan.querySelector("button[type=submit]");
-    btn.disabled = true;
-    btn.textContent = "Menganalisa...";
-    hasilKesehatan.hidden = true;
-
-    try {
-      const res = await fetch(ENDPOINT_KESEHATAN, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          umur, berat, tinggi, keluhan,
-          bmi: bmi.toFixed(1),
-          kategori: kategori.label
-        })
-      });
-      const data = await res.json();
-
-      hasilKesehatan.hidden = false;
-      hasilKesehatan.classList.toggle("error", !res.ok);
-
-      if (!res.ok) {
-        hasilKesehatan.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
-      } else {
-        const kategoriHtml = (data.kategori || [])
-          .map(kategori => `<span class="badge-kategori">${kategori}</span>`)
-          .join("");
-        const rekomendasiHtml = (data.rekomendasi_aksi || [])
-          .map(saran => `<li>${saran}</li>`)
-          .join("");
-
-        hasilKesehatan.innerHTML = `
-          <h3>BMI ${bmi.toFixed(1)} — ${kategori.label}</h3>
-          <p>${data.insight || ""}</p>
-          ${kategoriHtml ? `<div>${kategoriHtml}</div>` : ""}
-          ${rekomendasiHtml ? `<ul>${rekomendasiHtml}</ul>` : ""}
-          ${data.perlu_konsultasi_dokter ? "<p><strong>Disarankan berkonsultasi dengan tenaga medis.</strong></p>" : ""}
-        `;
-      }
-
-      simpanRiwayatLocal({
-        tanggal: new Date().toLocaleDateString("id-ID"),
-        berat, tinggi, bmi, kategori: kategori.label
-      });
-      renderRiwayatKesehatan();
-
-    } catch (err) {
-      hasilKesehatan.hidden = false;
-      hasilKesehatan.classList.add("error");
-      hasilKesehatan.innerHTML = `<p>Gagal terhubung ke server.</p>`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Analisa Kesehatan";
-    }
-  });
 
   const btnHitungDana = document.getElementById("btn-hitung-dana");
   const btnAlokasikanDana = document.getElementById("btn-alokasikan-dana");
   const hasilDana = document.getElementById("hasil-dana");
 
   async function muatDanaDarurat() {
+    if (!btnHitungDana || !hasilDana) return;
     btnHitungDana.disabled = true;
     btnHitungDana.textContent = "Menghitung...";
     hasilDana.hidden = true;
@@ -573,11 +701,13 @@
         hasilDana.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
       } else {
         const saldoSekarang = data.saldo ?? data.sisa;
+        const sumberPengeluaran = Number(data.total_pengeluaran ?? data.keuntungan ?? 0);
+        const labelSumber = sumberPengeluaran > 0 ? "Total pengeluaran bulan ini" : "Keuntungan bulan ini";
         document.getElementById("stat-dana").textContent = formatRupiah(saldoSekarang);
         document.getElementById("saldo-saat-ini").textContent = formatRupiah(saldoSekarang);
         hasilDana.innerHTML = `
           <h3>Rincian Dana Darurat Kesehatan</h3>
-          <p>Keuntungan bulan ini: ${formatRupiah(data.keuntungan)}</p>
+          <p>${labelSumber}: ${formatRupiah(data.total_pengeluaran ?? data.keuntungan ?? 0)}</p>
           <p>Alokasi tersedia (10%): ${formatRupiah(data.alokasi)}</p>
           <p>Saldo tersimpan: ${formatRupiah(saldoSekarang)}</p>
           <p><strong>Sisa dana darurat: ${formatRupiah(data.sisa)}</strong></p>
@@ -593,51 +723,65 @@
     }
   }
 
-  btnHitungDana.addEventListener("click", muatDanaDarurat);
+  if (btnHitungDana) {
+    btnHitungDana.addEventListener("click", muatDanaDarurat);
+  }
 
-  btnAlokasikanDana.addEventListener("click", async () => {
-    btnAlokasikanDana.disabled = true;
-    btnAlokasikanDana.textContent = "Menyimpan...";
+  if (btnAlokasikanDana) {
+    btnAlokasikanDana.addEventListener("click", async () => {
+      btnAlokasikanDana.disabled = true;
+      btnAlokasikanDana.textContent = "Menyimpan...";
 
-    try {
-      const res = await fetch(ENDPOINT_ALOKASI_DANA, { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal mengalokasikan dana.");
-      await muatDanaDarurat();
-    } catch (err) {
-      hasilDana.hidden = false;
-      hasilDana.classList.add("error");
-      hasilDana.innerHTML = `<p>${err.message || "Gagal terhubung ke server."}</p>`;
-    } finally {
-      btnAlokasikanDana.disabled = false;
-      btnAlokasikanDana.textContent = "Alokasikan";
-    }
-  });
-
-  document.getElementById("btn-setor-manual").addEventListener("click", async () => {
-    const jumlah = document.getElementById("input-setor-manual").value;
-    if (!jumlah || jumlah <= 0) return;
-
-    const formData = new FormData();
-    formData.append("jumlah", jumlah);
-
-    try {
-      const res = await fetch("/api/dana-darurat/setor", { method: "POST", body: formData });
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById("stat-dana").textContent = formatRupiah(data.saldo);
-        document.getElementById("saldo-saat-ini").textContent = formatRupiah(data.saldo);
-        document.getElementById("input-setor-manual").value = "";
+      try {
+        const res = await fetch(ENDPOINT_ALOKASI_DANA, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Gagal mengalokasikan dana.");
         await muatDanaDarurat();
-      } else {
-        throw new Error(data.error || "Gagal setor dana.");
+      } catch (err) {
+        hasilDana.hidden = false;
+        hasilDana.classList.add("error");
+        hasilDana.innerHTML = `<p>${err.message || "Gagal terhubung ke server."}</p>`;
+      } finally {
+        btnAlokasikanDana.disabled = false;
+        btnAlokasikanDana.textContent = "Alokasikan";
       }
-    } catch (err) {
-      alert("Gagal terhubung ke server.");
+    });
+  }
+
+  const setorButton = document.getElementById("btn-setor-manual");
+  if (setorButton) {
+    setorButton.addEventListener("click", async () => {
+      const input = document.getElementById("input-setor-manual");
+      const jumlah = input ? input.value : "";
+      if (!jumlah || jumlah <= 0) return;
+
+      const formData = new FormData();
+      formData.append("jumlah", jumlah);
+
+      try {
+        const res = await fetch("/api/dana-darurat/setor", { method: "POST", body: formData });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("stat-dana").textContent = formatRupiah(data.saldo);
+          document.getElementById("saldo-saat-ini").textContent = formatRupiah(data.saldo);
+          if (input) input.value = "";
+          await muatDanaDarurat();
+        } else {
+          throw new Error(data.error || "Gagal setor dana.");
+        }
+      } catch (err) {
+        alert("Gagal terhubung ke server.");
+      }
+    });
+  }
+
+  renderAirMinum();
+  loadBmiFromStorage();
+  window.addEventListener("storage", (event) => {
+    if (event.key === KEY_BMI_DATA) {
+      loadBmiFromStorage();
     }
   });
-
-  renderRiwayatKesehatan();
   muatDanaDarurat();
 </script>
 

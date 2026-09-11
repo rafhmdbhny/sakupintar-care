@@ -6,7 +6,7 @@
 <title>SAKU PINTAR&CARE — Asisten Keuangan yang canggih</title>
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 
 
 <style>
@@ -25,8 +25,8 @@
     --meja: #4b352d;
 
     --font-display: "Space Grotesk", sans-serif;
-    --font-body: "Inter", sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-mono: "Plus Jakarta Sans", sans-serif;
     --radius: 2px;
   }
 
@@ -64,6 +64,7 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     white-space: nowrap;
+    color: var(--ink);
   }
   .nav-links {
     display: flex;
@@ -75,9 +76,10 @@
   .nav-links a,
   .nav-logout {
     text-decoration: none;
-    font-family: var(--font-mono);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--carbon);
     padding: 0.5rem 0.8rem;
@@ -328,6 +330,10 @@
   }
   .box-stat::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--aksen); }
 
+  /* Fix: badge stempel (AMAN/HATI-HATI/AWAS BOROS) sengaja nongol keluar kotak
+     lewat posisi negatif, jadi box ini gak boleh ikut overflow:hidden */
+  #box-persen { overflow: visible; }
+
   .label-mono {
     font-family: var(--font-mono);
     font-size: 0.62rem;
@@ -466,38 +472,6 @@
   .hasil-ai ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
   .hasil-ai.error { border-left-color: var(--merah); color: var(--merah); }
 
-  .chat-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    max-height: 260px;
-    overflow-y: auto;
-    margin: 1rem 0 0.8rem;
-    padding: 0.8rem;
-    background: #e8eee9;
-    border: 1px solid rgba(138, 131, 117, 0.3);
-    border-radius: 14px;
-  }
-  .chat-msg {
-    max-width: 88%;
-    padding: 0.55rem 0.7rem;
-    font-size: 0.85rem;
-    line-height: 1.45;
-    white-space: pre-wrap;
-  }
-  .user-msg { align-self: flex-end; background: var(--aksen); color: #f7fffb; border-radius: 14px 14px 3px 14px; }
-  .ai-msg { align-self: flex-start; background: #fffdf7; border-left: 3px solid var(--hijau); border-radius: 3px 14px 14px 14px; }
-  .ai-msg.error { border-left-color: var(--merah); color: var(--merah); }
-  .chat-input-row {
-    display: flex;
-    gap: 0.6rem;
-    width: 100%;
-    align-items: stretch;
-  }
-  .chat-input-row > * { flex: 1; }
-  .chat-input-row input { min-width: 0; }
-  .chat-input-row button { flex: 0 0 auto; min-width: 120px; }
-
   .ledger { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
   .ledger th {
     text-align: left; font-size: 0.65rem; letter-spacing: 0.04em;
@@ -521,23 +495,125 @@
   .struk-kaki { text-align: center; margin-top: 2rem; }
   .struk-kaki p { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--carbon); }
 
-  .workspace-grid, .records-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
-  .workspace-grid .panel, .records-grid .panel {
-    padding: 1.25rem;
-    background: rgba(255, 253, 247, 0.48);
-    border: 1px solid rgba(138, 131, 117, 0.2);
-    border-radius: 18px;
+  /* ===================== Chat Bubble Ngambang (BARU) ===================== */
+  .chat-bubble-btn {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 5.5rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 25px -8px rgba(0, 0, 0, .5);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .chat-bubble-btn:hover { background: #3a352c; transform: scale(1.05); }
+  .chat-bubble-btn svg { width: 26px; height: 26px; }
+
+  .chat-panel {
+    position: fixed;
+    bottom: 5.25rem;
+    right: 5.5rem;
+    width: 320px;
+    max-width: calc(100vw - 2rem);
+    max-height: 70vh;
+    background: var(--paper);
+    box-shadow: 0 25px 50px -15px rgba(0, 0, 0, .6);
     display: flex;
     flex-direction: column;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .chat-panel[hidden] { display: none; }
+
+  .chat-panel-header {
+    position: relative;
+    padding: 1rem 2.2rem 1rem 1rem;
+    background: var(--paper-dark);
+    border-bottom: 1px solid var(--carbon-light);
+  }
+  .chat-panel-header h3 { margin: 0; font-family: var(--font-display); font-size: .95rem; }
+  .chat-panel-header p { margin: .25rem 0 0; font-size: .78rem; color: var(--carbon); }
+  .btn-tutup-chat {
+    position: absolute;
+    top: .6rem; right: .6rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--carbon);
+    padding: .2rem .4rem;
+  }
+  .btn-tutup-chat:hover { color: var(--ink); }
+
+  .chat-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: .9rem;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    background: #e8eee9;
+  }
+  .chat-msg {
+    max-width: 88%;
+    padding: .55rem .7rem;
+    font-size: .85rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+  .user-msg { align-self: flex-end; background: var(--ink); color: var(--paper); border-radius: 14px 14px 3px 14px; }
+  .ai-msg { align-self: flex-start; background: #fffdf7; border-left: 3px solid var(--hijau); border-radius: 3px 14px 14px 14px; }
+  .ai-msg.error { border-left-color: var(--merah); color: var(--merah); }
+
+  .chat-panel-footer {
+    display: flex;
+    gap: .5rem;
+    padding: .7rem;
+    border-top: 1px solid var(--carbon-light);
+    background: var(--paper);
+  }
+  .chat-panel-footer input {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-body);
+    font-size: .85rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--carbon-light);
+    padding: .55rem .65rem;
+  }
+  .chat-panel-footer button {
+    flex: 0 0 auto;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: .82rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: .55rem .9rem;
+    cursor: pointer;
+  }
+  .chat-panel-footer button:hover { background: #3a352c; }
+  .chat-panel-footer button:disabled { opacity: .6; cursor: not-allowed; }
+
+  @media (max-width: 480px) {
+    .chat-panel { right: 1rem; left: 1rem; width: auto; bottom: 5rem; }
+    .chat-bubble-btn { right: 4.5rem; bottom: 1rem; width: 50px; height: 50px; }
   }
 
   @media (max-width: 480px) {
     .statistik { grid-template-columns: 1fr; }
     .struk { padding: 2.25rem 1.25rem 1.5rem; }
     .quick-links a { min-width: 100%; }
-  }
-  @media (max-width: 760px) {
-    .workspace-grid, .records-grid { grid-template-columns: 1fr; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -604,18 +680,6 @@
 
     <div class="flash" id="flash-box"><p id="flash-text"></p></div>
 
-    <div class="workspace-grid">
-    <!-- ================= CHAT LANGSUNG ================= -->
-    <section class="panel" aria-label="Chat langsung dengan asisten keuangan">
-      <h2>Chat Langsung</h2>
-      <p class="deskripsi">Tanya cepat tanpa mencatat transaksi.</p>
-      <div id="chat-box" class="chat-box" aria-live="polite" aria-label="Percakapan chat"></div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Tanya soal keuanganmu..." autocomplete="off">
-        <button type="button" id="chat-send" class="btn btn-utama" data-icon="→">Kirim</button>
-      </div>
-    </section>
-
     <!-- ================= TANYA AI / UPLOAD STRUK ================= -->
     <section class="panel" aria-label="Tanya asisten keuangan">
       <h2>Saku Pintar&Care</h2>
@@ -636,12 +700,10 @@
 
       <div id="hasil-tanya" class="hasil-ai" hidden></div>
     </section>
-    </div>
 
     <div class="sobekan"></div>
 
     <!-- ================= TAMBAH TRANSAKSI ================= -->
-    <div class="records-grid">
     <section class="panel" aria-label="Catat transaksi baru">
       <h2>Catat Transaksi</h2>
       <form id="form-transaksi" class="form-transaksi">
@@ -662,22 +724,10 @@
         </div>
         <button type="submit" class="btn btn-utama" data-icon="+">Catat Transaksi</button>
       </form>
+      <p class="deskripsi" style="margin-top: .9rem;">
+        Mau lihat riwayat lengkap? Buka halaman <a href="/laporan">Laporan</a>.
+      </p>
     </section>
-
-    <!-- ================= RIWAYAT ================= -->
-    <section class="panel" aria-label="Riwayat transaksi" id="riwayat">
-      <h2>Riwayat Transaksi</h2>
-      <table class="ledger" id="tabel-riwayat">
-        <thead>
-          <tr><th>Tanggal</th><th>Nama</th><th>Kategori</th><th class="rata-kanan">Harga</th></tr>
-        </thead>
-        <tbody id="tbody-riwayat">
-          
-        </tbody>
-      </table>
-      <p class="kosong" id="riwayat-kosong" hidden>Belum ada transaksi tercatat. Struk kamu masih kosong melompong.</p>
-    </section>
-    </div>
 
     <footer class="struk-kaki">
       <p>*** TERIMA KASIH SUDAH JUJUR SAMA DIRI SENDIRI ***</p>
@@ -716,6 +766,26 @@
       soal gaya hidup/kesehatan waktu ngejawab pertanyaan keuanganmu. Boleh dikosongkan
       kalau gak mau dipakai.
     </p>
+  </div>
+</div>
+
+<!-- ===================== CHAT BUBBLE NGAMBANG (BARU) ===================== -->
+<button type="button" class="chat-bubble-btn" id="btn-buka-chat" aria-label="Buka chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>
+  </svg>
+</button>
+
+<div class="chat-panel" id="panel-chat" hidden>
+  <div class="chat-panel-header">
+    <button type="button" class="btn-tutup-chat" id="btn-tutup-chat" aria-label="Tutup chat">&times;</button>
+    <h3>Halo, {{ session.get('username', 'Pengguna') }}!</h3>
+    <p>Apa yang mau kamu tanyakan?</p>
+  </div>
+  <div class="chat-panel-body" id="chat-box" aria-live="polite" aria-label="Percakapan chat"></div>
+  <div class="chat-panel-footer">
+    <input type="text" id="chat-input" placeholder="Tanya soal keuanganmu..." autocomplete="off">
+    <button type="button" id="chat-send">Kirim</button>
   </div>
 </div>
 
@@ -763,43 +833,237 @@
   const btnBubble = document.getElementById("btn-bubble");
   const panelBubble = document.getElementById("panel-bubble");
 
-  btnBubble.addEventListener("click", () => {
-    panelBubble.hidden = !panelBubble.hidden;
-  });
+  if (btnBubble && panelBubble) {
+    btnBubble.addEventListener("click", () => {
+      panelBubble.hidden = !panelBubble.hidden;
+    });
 
-  document.addEventListener("click", (e) => {
-    if (!panelBubble.hidden && !panelBubble.contains(e.target) && e.target !== btnBubble) {
-      panelBubble.hidden = true;
-    }
-  });
+    document.addEventListener("click", (e) => {
+      if (!panelBubble.hidden && !panelBubble.contains(e.target) && e.target !== btnBubble) {
+        panelBubble.hidden = true;
+      }
+    });
+  }
 
   const formTanya = document.getElementById("form-tanya");
   const hasilTanya = document.getElementById("hasil-tanya");
 
-  formTanya.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formTanya);
-    const btn = formTanya.querySelector("button[type=submit]");
+  if (formTanya && hasilTanya) {
+    formTanya.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(formTanya);
+      const btn = formTanya.querySelector("button[type=submit]");
 
-    btn.disabled = true;
-    btn.textContent = "Menunggu jawaban...";
-    hasilTanya.hidden = true;
+      btn.disabled = true;
+      btn.textContent = "Menunggu jawaban...";
+      hasilTanya.hidden = true;
 
+      try {
+        const res = await fetch(ENDPOINT_TANYA, { method: "POST", body: formData });
+        const data = await res.json();
+        renderHasilAI(hasilTanya, data, !res.ok);
+      } catch (err) {
+        renderHasilAI(hasilTanya, { error: "Gagal terhubung ke server." }, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Tanya";
+      }
+    });
+  }
+
+  const formTransaksi = document.getElementById("form-transaksi");
+
+  if (formTransaksi) {
+    formTransaksi.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(formTransaksi);
+      const btn = formTransaksi.querySelector("button[type=submit]");
+
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+
+      try {
+        const res = await fetch(ENDPOINT_TRANSAKSI, { method: "POST", body: formData });
+        if (!res.ok) throw new Error("Gagal menyimpan transaksi.");
+        tampilkanFlash("Transaksi berhasil dicatat.");
+        formTransaksi.reset();
+        muatStatistik();
+      } catch (err) {
+        tampilkanFlash(err.message || "Terjadi kesalahan saat menyimpan.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Catat Transaksi";
+      }
+    });
+  }
+
+  const btnAnalisa = document.getElementById("btn-analisa");
+  const hasilAnalisa = document.getElementById("hasil-analisa");
+
+  if (btnAnalisa && hasilAnalisa) {
+    btnAnalisa.addEventListener("click", async () => {
+      btnAnalisa.disabled = true;
+      btnAnalisa.textContent = "...";
+      hasilAnalisa.hidden = true;
+
+      try {
+        const res = await fetch("/analisa-menyeluruh"); 
+        const data = await res.json();
+
+        hasilAnalisa.hidden = false;
+        hasilAnalisa.classList.toggle("error", !res.ok);
+
+        if (!res.ok) {
+          hasilAnalisa.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
+        } else {
+          const saranHtml = (data.saran_aksi || [])
+            .map((s) => `<li>${s}</li>`).join("");
+
+          hasilAnalisa.innerHTML = `
+            <h3>Analisa Bulanan</h3>
+            <p class="baris-label">Kondisi Sekarang</p>
+            <p>${data.kondisi_sekarang || ""}</p>
+            <p class="baris-label">Proyeksi ke Depan</p>
+            <p>${data.proyeksi_kedepan || ""}</p>
+            ${saranHtml ? `<p class="baris-label">Saran Aksi</p><ul>${saranHtml}</ul>` : ""}
+          `;
+        }
+      } catch (err) {
+        hasilAnalisa.hidden = false;
+        hasilAnalisa.classList.add("error");
+        hasilAnalisa.innerHTML = `<p>Gagal terhubung ke server.</p>`;
+      } finally {
+        btnAnalisa.disabled = false;
+        btnAnalisa.textContent = "Analisa AI";
+      }
+    });
+  }
+
+  async function muatStatistik() {
     try {
-      const res = await fetch(ENDPOINT_TANYA, { method: "POST", body: formData });
-      const data = await res.json();
-      renderHasilAI(hasilTanya, data, !res.ok);
-    } catch (err) {
-      renderHasilAI(hasilTanya, { error: "Gagal terhubung ke server." }, true);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Tanya";
-    }
-  });
+      const res = await fetch(ENDPOINT_STATISTIK);
+      if (!res.ok) return;
+      const data = await res.json(); 
 
+      document.getElementById("stat-total").textContent = formatRupiah(data.total);
+      document.getElementById("stat-rata2").textContent = formatRupiah(data.rata_rata);
+      document.getElementById("stat-persen").textContent = (data.persen ?? 0).toFixed(1) + "%";
+      document.getElementById("label-budget").textContent =
+        "DARI BUDGET " + formatRupiah(data.budget ?? BUDGET_BULANAN);
+
+      const stempel = document.getElementById("stempel-status");
+      const persen = data.persen ?? 0;
+      stempel.classList.remove("stempel-merah", "stempel-kuning", "stempel-hijau");
+      if (persen >= 100) { stempel.textContent = "AWAS BOROS!"; stempel.classList.add("stempel-merah"); }
+      else if (persen >= 70) { stempel.textContent = "HATI-HATI"; stempel.classList.add("stempel-kuning"); }
+      else { stempel.textContent = "AMAN"; stempel.classList.add("stempel-hijau"); }
+    } catch (err) {
+    }
+  }
+
+  let refreshMainTimer = null;
+  function startMainAutoRefresh() {
+    if (refreshMainTimer) return;
+    refreshMainTimer = setInterval(() => {
+      muatStatistik();
+    }, 5000);
+  }
+
+  startMainAutoRefresh();
+
+  const ENDPOINT_PENGATURAN = "/pengaturan";
+
+  const modalSetting = document.getElementById("modal-setting");
+  const btnBukaSetting = document.getElementById("btn-buka-setting");
+  const btnTutupSetting = document.getElementById("btn-tutup-setting");
+  const formPengaturan = document.getElementById("form-pengaturan");
+
+  if (modalSetting && btnBukaSetting && btnTutupSetting && formPengaturan) {
+    async function bukaModalSetting() {
+      modalSetting.hidden = false;
+
+      try {
+        const res = await fetch(ENDPOINT_PENGATURAN);
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById("input-budget").value = data.budget_bulanan ?? "";
+          document.getElementById("input-umur").value = data.umur ?? "";
+          document.getElementById("input-berat").value = data.berat_badan ?? "";
+          document.getElementById("input-tinggi").value = data.tinggi_badan ?? "";
+        }
+      } catch (err) {
+      }
+    }
+
+    function tutupModalSetting() {
+      modalSetting.hidden = true;
+    }
+
+    btnBukaSetting.addEventListener("click", bukaModalSetting);
+    btnTutupSetting.addEventListener("click", tutupModalSetting);
+
+    modalSetting.addEventListener("click", (e) => {
+      if (e.target === modalSetting) tutupModalSetting();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modalSetting.hidden) tutupModalSetting();
+    });
+
+    formPengaturan.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(formPengaturan);
+      const btn = formPengaturan.querySelector("button[type=submit]");
+
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+
+      try {
+        const res = await fetch(ENDPOINT_PENGATURAN, { method: "POST", body: formData });
+        if (!res.ok) throw new Error("Gagal menyimpan pengaturan.");
+
+        const berat = Number(formData.get("berat_badan"));
+        const tinggi = Number(formData.get("tinggi_badan"));
+        if (Number.isFinite(berat) && berat > 0 && Number.isFinite(tinggi) && tinggi > 0) {
+          localStorage.setItem("saku_bmi_data", JSON.stringify({ berat, tinggi }));
+        }
+
+        tampilkanFlash("Pengaturan berhasil disimpan.");
+        tutupModalSetting();
+        muatStatistik();
+      } catch (err) {
+        tampilkanFlash(err.message || "Terjadi kesalahan saat menyimpan pengaturan.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Simpan";
+      }
+    });
+  }
+
+  // --- Chat Bubble Ngambang (BARU) ---
+  const btnBukaChat = document.getElementById("btn-buka-chat");
+  const btnTutupChat = document.getElementById("btn-tutup-chat");
+  const panelChat = document.getElementById("panel-chat");
   const chatBox = document.getElementById("chat-box");
   const chatInput = document.getElementById("chat-input");
   const chatSend = document.getElementById("chat-send");
+
+  function bukaPanelChat() {
+    panelChat.hidden = false;
+    btnBukaChat.setAttribute("aria-expanded", "true");
+    chatInput.focus();
+  }
+
+  function tutupPanelChat() {
+    panelChat.hidden = true;
+    btnBukaChat.setAttribute("aria-expanded", "false");
+  }
+
+  btnBukaChat.addEventListener("click", () => {
+    if (panelChat.hidden) bukaPanelChat();
+    else tutupPanelChat();
+  });
+  btnTutupChat.addEventListener("click", tutupPanelChat);
 
   function tambahPesanChat(teks, className) {
     const pesan = document.createElement("div");
@@ -817,7 +1081,7 @@
     tambahPesanChat(message, "user-msg");
     chatInput.value = "";
     chatSend.disabled = true;
-    chatSend.textContent = "Menunggu...";
+    chatSend.textContent = "...";
     const loading = tambahPesanChat("Mengetik...", "ai-msg");
 
     try {
@@ -848,193 +1112,7 @@
     if (e.key === "Enter") kirimPesanChat();
   });
 
-  const formTransaksi = document.getElementById("form-transaksi");
-
-  formTransaksi.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formTransaksi);
-    const btn = formTransaksi.querySelector("button[type=submit]");
-
-    btn.disabled = true;
-    btn.textContent = "Menyimpan...";
-
-    try {
-      const res = await fetch(ENDPOINT_TRANSAKSI, { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Gagal menyimpan transaksi.");
-      tampilkanFlash("Transaksi berhasil dicatat.");
-      formTransaksi.reset();
-      muatStatistik();
-      muatRiwayat();
-    } catch (err) {
-      tampilkanFlash(err.message || "Terjadi kesalahan saat menyimpan.");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Catat Transaksi";
-    }
-  });
-
-  const btnAnalisa = document.getElementById("btn-analisa");
-  const hasilAnalisa = document.getElementById("hasil-analisa");
-
-  btnAnalisa.addEventListener("click", async () => {
-    btnAnalisa.disabled = true;
-    btnAnalisa.textContent = "...";
-    hasilAnalisa.hidden = true;
-
-    try {
-      const res = await fetch("/analisa-menyeluruh"); 
-      const data = await res.json();
-
-      hasilAnalisa.hidden = false;
-      hasilAnalisa.classList.toggle("error", !res.ok);
-
-      if (!res.ok) {
-        hasilAnalisa.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
-      } else {
-        const saranHtml = (data.saran_aksi || [])
-          .map((s) => `<li>${s}</li>`).join("");
-
-        hasilAnalisa.innerHTML = `
-          <h3>Analisa Bulanan</h3>
-          <p class="baris-label">Kondisi Sekarang</p>
-          <p>${data.kondisi_sekarang || ""}</p>
-          <p class="baris-label">Proyeksi ke Depan</p>
-          <p>${data.proyeksi_kedepan || ""}</p>
-          ${saranHtml ? `<p class="baris-label">Saran Aksi</p><ul>${saranHtml}</ul>` : ""}
-        `;
-      }
-    } catch (err) {
-      hasilAnalisa.hidden = false;
-      hasilAnalisa.classList.add("error");
-      hasilAnalisa.innerHTML = `<p>Gagal terhubung ke server.</p>`;
-    } finally {
-      btnAnalisa.disabled = false;
-      btnAnalisa.textContent = "Analisa AI";
-    }
-  });
-
-  async function muatStatistik() {
-    try {
-      const res = await fetch(ENDPOINT_STATISTIK);
-      if (!res.ok) return;
-      const data = await res.json(); 
-
-      document.getElementById("stat-total").textContent = formatRupiah(data.total);
-      document.getElementById("stat-rata2").textContent = formatRupiah(data.rata_rata);
-      document.getElementById("stat-persen").textContent = (data.persen ?? 0).toFixed(1) + "%";
-      document.getElementById("label-budget").textContent =
-        "DARI BUDGET " + formatRupiah(data.budget ?? BUDGET_BULANAN);
-
-      const stempel = document.getElementById("stempel-status");
-      const persen = data.persen ?? 0;
-      stempel.classList.remove("stempel-merah", "stempel-kuning", "stempel-hijau");
-      if (persen >= 100) { stempel.textContent = "AWAS BOROS!"; stempel.classList.add("stempel-merah"); }
-      else if (persen >= 70) { stempel.textContent = "HATI-HATI"; stempel.classList.add("stempel-kuning"); }
-      else { stempel.textContent = "AMAN"; stempel.classList.add("stempel-hijau"); }
-    } catch (err) {
-    }
-  }
-
-  async function muatRiwayat() {
-    try {
-      const res = await fetch(ENDPOINT_RIWAYAT);
-      if (!res.ok) return;
-      const data = await res.json();
-
-      const tbody = document.getElementById("tbody-riwayat");
-      const kosong = document.getElementById("riwayat-kosong");
-
-      if (!data || data.length === 0) {
-        tbody.innerHTML = "";
-        kosong.hidden = false;
-        return;
-      }
-      kosong.hidden = true;
-      tbody.innerHTML = data.map(t => `
-        <tr>
-          <td>${t.Tanggal}</td>
-          <td>${t.Nama}</td>
-          <td>${t.kartegori}</td>
-          <td class="rata-kanan">${formatRupiah(t.Harga)}</td>
-        </tr>
-      `).join("");
-    } catch (err) {
-    }
-  }
-
-  let refreshMainTimer = null;
-  function startMainAutoRefresh() {
-    if (refreshMainTimer) return;
-    refreshMainTimer = setInterval(() => {
-      muatStatistik();
-      muatRiwayat();
-    }, 5000);
-  }
-
-  startMainAutoRefresh();
-
-  const ENDPOINT_PENGATURAN = "/pengaturan";
-
-  const modalSetting = document.getElementById("modal-setting");
-  const btnBukaSetting = document.getElementById("btn-buka-setting");
-  const btnTutupSetting = document.getElementById("btn-tutup-setting");
-  const formPengaturan = document.getElementById("form-pengaturan");
-
-  async function bukaModalSetting() {
-    modalSetting.hidden = false;
-
-    try {
-      const res = await fetch(ENDPOINT_PENGATURAN);
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById("input-budget").value = data.budget_bulanan ?? "";
-        document.getElementById("input-umur").value = data.umur ?? "";
-        document.getElementById("input-berat").value = data.berat_badan ?? "";
-        document.getElementById("input-tinggi").value = data.tinggi_badan ?? "";
-      }
-    } catch (err) {
-    }
-  }
-
-  function tutupModalSetting() {
-    modalSetting.hidden = true;
-  }
-
-  btnBukaSetting.addEventListener("click", bukaModalSetting);
-  btnTutupSetting.addEventListener("click", tutupModalSetting);
-
-  modalSetting.addEventListener("click", (e) => {
-    if (e.target === modalSetting) tutupModalSetting();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modalSetting.hidden) tutupModalSetting();
-  });
-
-  formPengaturan.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formPengaturan);
-    const btn = formPengaturan.querySelector("button[type=submit]");
-
-    btn.disabled = true;
-    btn.textContent = "Menyimpan...";
-
-    try {
-      const res = await fetch(ENDPOINT_PENGATURAN, { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Gagal menyimpan pengaturan.");
-      tampilkanFlash("Pengaturan berhasil disimpan.");
-      tutupModalSetting();
-      muatStatistik();
-    } catch (err) {
-      tampilkanFlash(err.message || "Terjadi kesalahan saat menyimpan pengaturan.");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Simpan";
-    }
-  });
-
   muatStatistik();
-  muatRiwayat();
 </script>
 
 </body>
