@@ -19,6 +19,11 @@ from Services.Main_system import (
     Alokasikan_dana_darurat,
     Setor_manual_dana_darurat,
 )
+from Services.Health_System import (
+    Catat_konsumsi,
+    Baca_riwayat_konsumsi,
+    Analisa_kesehatan_menyeluruh,
+)
 
 app = Flask(__name__)
 app.config.update(
@@ -84,6 +89,51 @@ def api_kesehatan():
         return jsonify(hasil.model_dump())
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/catat-kesehatan', methods=['POST'])
+@login_required
+def catat_kesehatan():
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Login diperlukan.'}), 401
+
+    deskripsi = request.form.get('deskripsi', '').strip()
+    if not deskripsi:
+        return jsonify({'error': 'Deskripsi konsumsi/aktivitas wajib diisi.'}), 400
+
+    try:
+        hasil = Catat_konsumsi(username, deskripsi)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    return jsonify(hasil.model_dump())
+
+@app.route('/riwayat-kesehatan')
+@login_required
+def riwayat_kesehatan():
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Login diperlukan.'}), 401
+
+    df = Baca_riwayat_konsumsi(username)
+    return jsonify(df.to_dict(orient='records'))
+
+@app.route('/analisa-kesehatan-menyeluruh')
+@login_required
+def analisa_kesehatan_menyeluruh_route():
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Login diperlukan.'}), 401
+
+    try:
+        hasil = Analisa_kesehatan_menyeluruh(username)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    if hasil is None:
+        return jsonify({'error': 'Belum ada data konsumsi/aktivitas tersimpan.'}), 400
+
+    return jsonify(hasil.model_dump())
 
 @app.route('/api/dana-darurat')
 @login_required
@@ -243,18 +293,35 @@ def tanya():
     # Kalau AI berhasil nangkep nama transaksi DAN harga, otomatis dicatat ke CSV.
     # Kalau harga gak ketahuan (None), gak disimpen dulu — biar insight/rekomendasi
     # AI yang minta user kasih tau harganya susulan.
+    catatan_kesehatan = None
+
     if hasil.nama_transaksi and hasil.harga is not None:
         kartegori = hasil.kategori[0] if hasil.kategori else "Lainnya"
         save_riwayat_transaksi(
             username=username,
             now=now,
             nama=hasil.nama_transaksi,
-            jumlah=1,
+            jumlah=hasil.jumlah,
             harga=hasil.harga,
             kartegori=kartegori,
         )
 
-    return jsonify(hasil.model_dump())
+        # BARU: kalau transaksi ini makanan/minuman, catat juga ke riwayat
+        # kesehatan (kalori & kategori sehat/kurang sehat/tidak sehat).
+        # Jumlah/porsi ikut dikirim biar Gemini hitung total kalori sesuai
+        # porsi yang beneran dikonsumsi, bukan cuma per 1 porsi.
+        if hasil.kategori and "Makanan & Minuman" in hasil.kategori:
+            try:
+                deskripsi_konsumsi = f"{hasil.jumlah}x {hasil.nama_transaksi}"
+                catatan_kesehatan = Catat_konsumsi(username, deskripsi_konsumsi)
+            except Exception as e:
+                catatan_kesehatan = None
+
+    response_data = hasil.model_dump()
+    if catatan_kesehatan:
+        response_data["catatan_kesehatan"] = catatan_kesehatan.model_dump()
+
+    return jsonify(response_data)
 
 
 @app.route('/transaksi', methods=['POST'])

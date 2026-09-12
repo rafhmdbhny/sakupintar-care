@@ -351,6 +351,36 @@
   .hasil-ai p { margin: 0 0 0.4rem; }
   .hasil-ai p:last-child { margin-bottom: 0; }
   .hasil-ai.error { border-left-color: var(--merah); color: var(--merah); }
+  .hasil-ai ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+  .hasil-ai .baris-label {
+    font-family: var(--font-mono); font-size: .62rem; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--carbon); margin: .6rem 0 .15rem;
+  }
+  .hasil-ai .baris-label:first-of-type { margin-top: 0; }
+
+  /* ===================== Tabel Riwayat Konsumsi/Aktivitas (BARU) ===================== */
+  .ledger { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.78rem; }
+  .ledger th {
+    text-align: left; font-size: .62rem; letter-spacing: .04em; color: var(--carbon);
+    text-transform: uppercase; border-bottom: 1px solid var(--ink); padding-bottom: .4rem;
+  }
+  .ledger td { padding: .5rem .3rem; border-bottom: 1px dashed var(--carbon-light); }
+  .rata-kanan { text-align: right; }
+  .kosong { font-size: .85rem; color: var(--carbon); font-style: italic; }
+
+  .badge-kategori {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .badge-sehat { background: rgba(47, 93, 70, 0.15); color: var(--hijau); }
+  .badge-kurang-sehat { background: rgba(168, 114, 31, 0.15); color: var(--kuning); }
+  .badge-tidak-sehat { background: rgba(169, 50, 38, 0.15); color: var(--merah); }
 
   .struk-kaki { text-align: center; margin-top: 2rem; }
   .struk-kaki p { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; color: var(--carbon); }
@@ -482,6 +512,52 @@
         </div>
       </div>
       <div id="hasil-dana" class="hasil-ai" hidden></div>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= CATAT KONSUMSI / AKTIVITAS (BARU) ================= -->
+    <section class="panel" aria-label="Catat konsumsi atau aktivitas">
+      <h2>Catat Konsumsi / Aktivitas</h2>
+      <p class="deskripsi">
+        Ketik makanan/minuman yang kamu konsumsi, atau aktivitas fisik yang kamu lakukan.
+        Contoh: "makan nasi goreng dan telur ceplok" atau "lari pagi 30 menit".
+      </p>
+      <form id="form-kesehatan">
+        <div class="baris-input">
+          <input type="text" id="input-deskripsi-kesehatan" name="deskripsi"
+                 placeholder="Contoh: minum kopi susu satu gelas" required>
+          <button type="submit" class="btn btn-utama">Catat</button>
+        </div>
+      </form>
+      <div id="hasil-catat-kesehatan" class="hasil-ai" hidden></div>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= RIWAYAT KONSUMSI & AKTIVITAS (BARU) ================= -->
+    <section class="panel" aria-label="Riwayat konsumsi dan aktivitas">
+      <h2>Riwayat Konsumsi &amp; Aktivitas</h2>
+      <table class="ledger" id="tabel-riwayat-kesehatan">
+        <thead>
+          <tr>
+            <th>Tanggal</th><th>Jenis</th><th>Nama</th>
+            <th class="rata-kanan">Kalori</th><th>Kategori</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-riwayat-kesehatan"></tbody>
+      </table>
+      <p class="kosong" id="riwayat-kesehatan-kosong" hidden>Belum ada konsumsi/aktivitas tercatat.</p>
+    </section>
+
+    <div class="sobekan"></div>
+
+    <!-- ================= ANALISA KESEHATAN MENYELURUH (BARU) ================= -->
+    <section class="panel" aria-label="Analisa kesehatan menyeluruh">
+      <h2>Analisa Kesehatan Menyeluruh</h2>
+      <p class="deskripsi">Analisa pola konsumsi &amp; aktivitas kamu dari semua riwayat yang tercatat.</p>
+      <button id="btn-analisa-kesehatan" class="btn btn-sekunder">Analisa Menyeluruh</button>
+      <div id="hasil-analisa-kesehatan" class="hasil-ai" hidden></div>
     </section>
 
     <footer class="struk-kaki">
@@ -780,6 +856,129 @@
     }
   });
   muatDanaDarurat();
+
+  // ===================== Catat Konsumsi / Aktivitas (BARU) =====================
+  function badgeKategoriHtml(kategori) {
+    const kelas = kategori === "Sehat" ? "badge-sehat"
+      : kategori === "Kurang Sehat" ? "badge-kurang-sehat"
+      : "badge-tidak-sehat";
+    return `<span class="badge-kategori ${kelas}">${kategori}</span>`;
+  }
+
+  const formKesehatan = document.getElementById("form-kesehatan");
+  const hasilCatatKesehatan = document.getElementById("hasil-catat-kesehatan");
+
+  formKesehatan.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const deskripsi = document.getElementById("input-deskripsi-kesehatan").value.trim();
+    if (!deskripsi) return;
+
+    const btn = formKesehatan.querySelector("button[type=submit]");
+    btn.disabled = true;
+    btn.textContent = "Menganalisa...";
+    hasilCatatKesehatan.hidden = true;
+
+    try {
+      const formData = new FormData();
+      formData.append("deskripsi", deskripsi);
+      const res = await fetch("/catat-kesehatan", { method: "POST", body: formData });
+      const data = await res.json();
+
+      hasilCatatKesehatan.hidden = false;
+      hasilCatatKesehatan.classList.toggle("error", !res.ok);
+
+      if (!res.ok) {
+        hasilCatatKesehatan.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
+      } else {
+        hasilCatatKesehatan.innerHTML = `
+          <h3>${data.nama} ${badgeKategoriHtml(data.kategori_kesehatan)}</h3>
+          <p><strong>${data.jenis}</strong> &middot; ~${data.kalori} kalori</p>
+          <p>${data.catatan_nutrisi}</p>
+          <p style="color:var(--carbon); font-size:.8rem;">${data.alasan}</p>
+        `;
+        formKesehatan.reset();
+        muatRiwayatKesehatan();
+      }
+    } catch (err) {
+      hasilCatatKesehatan.hidden = false;
+      hasilCatatKesehatan.classList.add("error");
+      hasilCatatKesehatan.innerHTML = `<p>Gagal terhubung ke server.</p>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Catat";
+    }
+  });
+
+  async function muatRiwayatKesehatan() {
+    try {
+      const res = await fetch("/riwayat-kesehatan");
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const tbody = document.getElementById("tbody-riwayat-kesehatan");
+      const kosong = document.getElementById("riwayat-kesehatan-kosong");
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = "";
+        kosong.hidden = false;
+        return;
+      }
+      kosong.hidden = true;
+
+      const urut = [...data].sort((a, b) => (a.Tanggal < b.Tanggal ? 1 : -1));
+      tbody.innerHTML = urut.map(row => `
+        <tr>
+          <td>${row.Tanggal}</td>
+          <td>${row.Jenis}</td>
+          <td>${row.Nama}</td>
+          <td class="rata-kanan">${row.Kalori}</td>
+          <td>${badgeKategoriHtml(row.Kategori)}</td>
+        </tr>
+      `).join("");
+    } catch (err) {
+      // biarkan tabel kosong kalau gagal load
+    }
+  }
+
+  // ===================== Analisa Kesehatan Menyeluruh (BARU) =====================
+  const btnAnalisaKesehatan = document.getElementById("btn-analisa-kesehatan");
+  const hasilAnalisaKesehatan = document.getElementById("hasil-analisa-kesehatan");
+
+  btnAnalisaKesehatan.addEventListener("click", async () => {
+    btnAnalisaKesehatan.disabled = true;
+    btnAnalisaKesehatan.textContent = "Menganalisa...";
+    hasilAnalisaKesehatan.hidden = true;
+
+    try {
+      const res = await fetch("/analisa-kesehatan-menyeluruh");
+      const data = await res.json();
+
+      hasilAnalisaKesehatan.hidden = false;
+      hasilAnalisaKesehatan.classList.toggle("error", !res.ok);
+
+      if (!res.ok) {
+        hasilAnalisaKesehatan.innerHTML = `<p>${data.error || "Terjadi kesalahan."}</p>`;
+      } else {
+        const saranHtml = (data.saran_aksi || []).map(s => `<li>${s}</li>`).join("");
+        hasilAnalisaKesehatan.innerHTML = `
+          <p class="baris-label">Kondisi Sekarang</p>
+          <p>${data.kondisi_sekarang}</p>
+          <p class="baris-label">Proyeksi ke Depan</p>
+          <p>${data.proyeksi_kedepan}</p>
+          ${saranHtml ? `<p class="baris-label">Saran Aksi</p><ul>${saranHtml}</ul>` : ""}
+        `;
+      }
+    } catch (err) {
+      hasilAnalisaKesehatan.hidden = false;
+      hasilAnalisaKesehatan.classList.add("error");
+      hasilAnalisaKesehatan.innerHTML = `<p>Gagal terhubung ke server.</p>`;
+    } finally {
+      btnAnalisaKesehatan.disabled = false;
+      btnAnalisaKesehatan.textContent = "Analisa Menyeluruh";
+    }
+  });
+
+  muatRiwayatKesehatan();
 </script>
 
 </body>

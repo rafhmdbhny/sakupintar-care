@@ -59,6 +59,14 @@ class HasilAnalisis(BaseModel):
         default=None,
         description="Nama barang/transaksi yang disebut user. KOSONGKAN jika input bukan transaksi."
     )
+    jumlah: int = Field(
+        default=1,
+        description=(
+            "Jumlah/porsi barang yang dibeli atau dikonsumsi, sesuai yang "
+            "disebutkan user (misal 'beli 3 mie gacoan' -> 3). Kalau user TIDAK "
+            "menyebutkan jumlah sama sekali, isi dengan angka 1 (default)."
+        )
+    )
     harga: int | None = Field(
         default=None,
         description="Harga dalam Rupiah jika disebutkan user. KOSONGKAN (null) jika tidak disebutkan/tidak diketahui."
@@ -74,7 +82,10 @@ AnalisaMenyeluruh_config = genai.types.GenerateContentConfig(
 finance_config = genai.types.GenerateContentConfig(
     system_instruction="Kamu adalah asisten keuangan galak yang selalu mengingatkan user untuk hemat. " \
                        "Jelaskan penjelasan berdasarkan data dari user dan berikan saran yang sesuai. " \
-                       "Jangan memberikan saran yang tidak relevan.",
+                       "Jangan memberikan saran yang tidak relevan. " \
+                       "Kalau input berupa transaksi, perhatikan baik-baik apakah user menyebutkan " \
+                       "jumlah/porsi (misal 'beli 3 mie gacoan', '2 kopi susu') dan isi field 'jumlah' " \
+                       "sesuai angka itu. Kalau user tidak menyebutkan jumlah sama sekali, isi 'jumlah' dengan 1.",
     temperature=0.3,
     response_schema=HasilAnalisis,
     response_mime_type="application/json",
@@ -357,4 +368,3 @@ def Cek_login(username, password):
         return False
 
     return check_password_hash(users[username]["password_hash"], password)
-
